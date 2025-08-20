@@ -50,6 +50,9 @@ export class Home implements OnInit, OnDestroy {
   ngOnInit() {
     // Check KGWin status on component initialization
     this.checkKGWinStatus();
+    
+    // Check for data from KGWin in URL parameters
+    this.checkForKGWinData();
   }
 
   ngOnDestroy() {
@@ -119,5 +122,101 @@ export class Home implements OnInit, OnDestroy {
         toast.parentNode.removeChild(toast);
       }
     }, 5000);
+  }
+
+  private checkForKGWinData() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const dataParam = urlParams.get('data');
+      
+      if (dataParam) {
+        // Decode the data
+        const decodedData = decodeURIComponent(dataParam);
+        const kgWinData = JSON.parse(decodedData);
+        
+        // Show popup with KGWin data
+        this.showKGWinDataPopup(kgWinData);
+        
+        // Clear the URL parameter to avoid showing popup again on refresh
+        const newUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, document.title, newUrl);
+      }
+    } catch (error) {
+      console.error('Error parsing KGWin data:', error);
+    }
+  }
+
+  private showKGWinDataPopup(data: any) {
+    // Create a modal popup with the KGWin data
+    const modal = document.createElement('div');
+    modal.className = 'modal fade show';
+    modal.style.cssText = 'display: block; z-index: 9999;';
+    modal.innerHTML = `
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">
+              <i class="fas fa-desktop me-2"></i>
+              Data Received from KGWin Desktop Application
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6><i class="fas fa-info-circle me-2"></i>Application Info</h6>
+                <ul class="list-unstyled">
+                  <li><strong>Application:</strong> ${data.application}</li>
+                  <li><strong>Version:</strong> ${data.version}</li>
+                  <li><strong>Status:</strong> <span class="badge bg-success">${data.status}</span></li>
+                  <li><strong>User:</strong> ${data.user}</li>
+                  <li><strong>Machine:</strong> ${data.machine}</li>
+                  <li><strong>Timestamp:</strong> ${data.timestamp}</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6><i class="fas fa-list me-2"></i>Features</h6>
+                <ul class="list-unstyled">
+                  ${data.features.map((feature: string) => `<li><i class="fas fa-check text-success me-2"></i>${feature}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+            <div class="mt-3">
+              <h6><i class="fas fa-code me-2"></i>Raw JSON Data</h6>
+              <pre class="bg-light p-3 rounded"><code>${JSON.stringify(data, null, 2)}</code></pre>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="window.location.reload()">Refresh Page</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    backdrop.style.cssText = 'z-index: 9998;';
+    
+    document.body.appendChild(backdrop);
+    document.body.appendChild(modal);
+    
+    // Add event listener to close modal
+    const closeButtons = modal.querySelectorAll('[data-bs-dismiss="modal"]');
+    closeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        document.body.removeChild(modal);
+        document.body.removeChild(backdrop);
+      });
+    });
+    
+    // Auto-close after 10 seconds
+    setTimeout(() => {
+      if (document.body.contains(modal)) {
+        document.body.removeChild(modal);
+        document.body.removeChild(backdrop);
+      }
+    }, 10000);
   }
 }
