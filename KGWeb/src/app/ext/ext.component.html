@@ -1,0 +1,79 @@
+<div class="chat-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-title">
+      <h4 class="mb-0">Browser Ext Communication</h4>
+      <small class="text-muted">Chat with KGWin using browser extension</small>
+    </div>
+    <div class="connection-status">
+      <div class="status-row">
+        <div class="status-indicator" [ngClass]="extensionDetected ? 'connected' : 'disconnected'"></div>
+        <span [ngClass]="extensionDetected ? 'text-success' : 'text-danger'">
+          Extension: {{ extensionDetected ? 'Connected' : 'Disconnected' }}
+        </span>
+      </div>
+      <div class="status-row">
+        <div class="status-indicator" [ngClass]="kgwinConnected ? 'connected' : 'disconnected'"></div>
+        <span [ngClass]="kgwinConnected ? 'text-success' : 'text-danger'">
+          KGWin: {{ kgwinConnected ? 'Connected' : 'Disconnected' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Messages Area -->
+  <div class="chat-messages" #messagesContainer>
+    <div *ngFor="let message of chatMessages" 
+         class="message" 
+         [ngClass]="{
+           'message-sent': message.isFromSelf,
+           'message-received': !message.isFromSelf && message.type !== 'system',
+           'message-system': message.type === 'system'
+         }">
+      
+      <div class="message-content">
+        <div class="message-header">
+          <span class="message-sender">{{ message.isFromSelf ? 'You' : message.fromName }}</span>
+          <span class="message-time">{{ message.timestamp | date:'HH:mm:ss' }}</span>
+        </div>
+        <div class="message-text" [ngClass]="{'json-content': message.isJson}">
+          <pre *ngIf="message.isJson">{{ message.content }}</pre>
+          <span *ngIf="!message.isJson">{{ message.content }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Input Area -->
+  <div class="chat-input">
+    <div class="input-controls">
+      <div class="message-input-area">
+        <textarea class="form-control" 
+                  [(ngModel)]="messageInput" 
+                  placeholder="Type your message here..."
+                  rows="3"
+                  (keydown.enter)="onEnterPress($event)"></textarea>
+        <button class="btn btn-primary send-button" 
+                (click)="sendMessage()" 
+                [disabled]="!isRegistered || !messageInput.trim()">
+          Send {{isRegistered ? 'registered': 'not registered' }}
+        </button>
+      </div>
+      
+      <div class="quick-actions">
+        <button class="btn btn-outline-secondary btn-sm" (click)="insertTestJson()">
+          Insert Test Asset JSON
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="insertTestMarkerJson()">
+          Insert Test Marker JSON
+        </button>
+        <button class="btn btn-outline-warning btn-sm" (click)="clearChat()">
+          Clear Chat
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

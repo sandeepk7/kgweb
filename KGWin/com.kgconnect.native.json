@@ -1,0 +1,9 @@
+{
+    "name":  "com.kgconnect.native",
+    "description":  "KGConnect Native Messaging Host",
+    "path":  "D:\\Work\\Office\\Damco\\KloudGin\\POC\\KGWin\\KGWin\\bin\\Debug\\net8.0-windows10.0.19041.0\\KGWin.exe",
+    "type":  "stdio",
+    "allowed_origins":  [
+                            "chrome-extension://*"
+                        ]
+}
