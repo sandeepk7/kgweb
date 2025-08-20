@@ -13,13 +13,13 @@ export interface ChatMessage {
 }
 
 @Component({
-  selector: 'app-chat',
-  templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.css'],
+  selector: 'app-signalr',
+  templateUrl: './signalr.component.html',
+  styleUrls: ['./signalr.component.css'],
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class SignalrComponent implements OnInit, OnDestroy {
   connectionStatus = false;
   connectionState = 'Disconnected';
   chatMessages: ChatMessage[] = [];
