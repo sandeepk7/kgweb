@@ -138,11 +138,7 @@
                             Style="{StaticResource NavButtonStyle}"
                             Click="SignalRMonitorButton_Click"
                             Margin="10,0,0,0"/>
-                    <Button x:Name="BrowserExtButton" 
-                            Content="Browser Ext Communication" 
-                            Style="{StaticResource NavButtonStyle}"
-                            Click="BrowserExtButton_Click"
-                            Margin="10,0,0,0"/>
+
                 </StackPanel>
             </Grid>
         </Border>

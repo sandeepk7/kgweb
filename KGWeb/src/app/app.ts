@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { TabManagerService } from './services/tab-manager.service';
 
 @Component({
   selector: 'app-root',
@@ -8,4 +9,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './app.css'
 })
 export class App {
+  constructor(private tabManagerService: TabManagerService) {
+    // The service will automatically initialize tab tracking
+  }
 }

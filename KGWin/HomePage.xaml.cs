@@ -112,7 +112,7 @@ namespace KGWin
                 
                 foreach (string className in browserClasses)
                 {
-                    IntPtr browserWindow = FindWindow(className, null);
+                    IntPtr browserWindow = FindWindow(className, string.Empty);
                     if (browserWindow != IntPtr.Zero)
                     {
                         // Check if this browser window has KGWeb tab

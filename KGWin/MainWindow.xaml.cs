@@ -19,7 +19,6 @@ namespace KGWin
         private HomePage? homePage;
         private MapPage? mapPage;
         private SignalRCommunicationPage? signalRMonitorPage;
-        private BrowserExtPage? browserExtPage;
 
         public MainWindow()
         {
@@ -53,12 +52,7 @@ namespace KGWin
             UpdateNavigationButtons(SignalRMonitorButton);
         }
 
-        private void NavigateToBrowserExt()
-        {
-            browserExtPage = new BrowserExtPage();
-            MainFrame.Navigate(browserExtPage);
-            UpdateNavigationButtons(BrowserExtButton);
-        }
+
 
         private void UpdateNavigationButtons(Button activeButton, params Button[] inactiveButtons)
         {
@@ -66,7 +60,6 @@ namespace KGWin
             HomeButton.Style = (Style)FindResource("NavButtonStyle");
             MapButton.Style = (Style)FindResource("NavButtonStyle");
             SignalRMonitorButton.Style = (Style)FindResource("NavButtonStyle");
-            BrowserExtButton.Style = (Style)FindResource("NavButtonStyle");
             
             // Set active button style
             activeButton.Style = (Style)FindResource("ActiveNavButtonStyle");
@@ -87,9 +80,6 @@ namespace KGWin
             NavigateToSignalRMonitor();
         }
 
-        private void BrowserExtButton_Click(object sender, RoutedEventArgs e)
-        {
-            NavigateToBrowserExt();
-        }
+
     }
 }
