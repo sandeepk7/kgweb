@@ -57,18 +57,12 @@ namespace KGWin
                 // Create URL with data parameter
                 string kgWebUrl = $"https://sandeepk7.github.io/kgweb/?data={encodedData}";
 
-                // Open in default browser
+                // Open in default browser silently
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = kgWebUrl,
                     UseShellExecute = true
                 });
-
-                MessageBox.Show(
-                    $"Opening KGWeb application with KGWin data:\n\n{jsonData}",
-                    "Opening KGWeb",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

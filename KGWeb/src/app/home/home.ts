@@ -126,27 +126,42 @@ export class Home implements OnInit, OnDestroy {
 
   private checkForKGWinData() {
     try {
+      console.log('🔍 Checking for KGWin data in URL...');
+      console.log('Current URL:', window.location.href);
+      
       const urlParams = new URLSearchParams(window.location.search);
       const dataParam = urlParams.get('data');
+      
+      console.log('Data parameter found:', !!dataParam);
+      console.log('Data parameter value:', dataParam);
       
       if (dataParam) {
         // Decode the data
         const decodedData = decodeURIComponent(dataParam);
+        console.log('Decoded data:', decodedData);
+        
         const kgWinData = JSON.parse(decodedData);
+        console.log('Parsed KGWin data:', kgWinData);
         
         // Show popup with KGWin data
+        console.log('🎉 Showing KGWin data popup...');
         this.showKGWinDataPopup(kgWinData);
         
         // Clear the URL parameter to avoid showing popup again on refresh
         const newUrl = window.location.pathname + window.location.hash;
         window.history.replaceState({}, document.title, newUrl);
+        console.log('URL cleared, new URL:', newUrl);
+      } else {
+        console.log('❌ No data parameter found in URL');
       }
     } catch (error) {
-      console.error('Error parsing KGWin data:', error);
+      console.error('❌ Error parsing KGWin data:', error);
     }
   }
 
   private showKGWinDataPopup(data: any) {
+    console.log('🎨 Creating KGWin data popup...');
+    
     // Create a modal popup with the KGWin data
     const modal = document.createElement('div');
     modal.className = 'modal fade show';
@@ -202,6 +217,8 @@ export class Home implements OnInit, OnDestroy {
     document.body.appendChild(backdrop);
     document.body.appendChild(modal);
     
+    console.log('✅ KGWin data popup created and added to DOM');
+    
     // Add event listener to close modal
     const closeButtons = modal.querySelectorAll('[data-bs-dismiss="modal"]');
     closeButtons.forEach(button => {
@@ -216,6 +233,7 @@ export class Home implements OnInit, OnDestroy {
       if (document.body.contains(modal)) {
         document.body.removeChild(modal);
         document.body.removeChild(backdrop);
+        console.log('⏰ KGWin data popup auto-closed after 10 seconds');
       }
     }, 10000);
   }
