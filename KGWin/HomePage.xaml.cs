@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Diagnostics;
 using System.Web;
+using System.Windows.Threading;
 
 namespace KGWin
 {

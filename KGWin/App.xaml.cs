@@ -8,6 +8,8 @@ using System.Text.Json;
 using System.Text;
 using System.Collections.Generic;
 using System.IO;
+using System;
+using System.Windows.Threading;
 
 namespace KGWin
 {
@@ -25,6 +27,11 @@ namespace KGWin
         public static DateTime LastNativeMessageReceived { get; private set; } = DateTime.MinValue;
         public static bool HasReceivedNativeMessages => (DateTime.Now - LastNativeMessageReceived).TotalSeconds < 30;
 
+        // Pending popup data when launched via custom protocol
+        private string? _pendingAssetId;
+        private string? _pendingLayerId;
+        private bool _hasShownPendingPopup;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -38,14 +45,49 @@ namespace KGWin
 
             if (e.Args.Length > 0)
             {
-                string protocolUrl = e.Args[0]; // e.g., kgwin://launch?assetId=123&layerId=456
+                try
+                {
+                    string protocolUrl = e.Args[0]; // e.g., kgwin://launch?assetId=123&layerId=456
 
-                Uri uri = new Uri(protocolUrl);
-                string assetId = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("assetId");
-                string layerId = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("layerId");
+                    Uri uri = new Uri(protocolUrl);
+                    _pendingAssetId = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("assetId") ?? string.Empty;
+                    _pendingLayerId = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("layerId") ?? string.Empty;
 
-                MessageBox.Show($"Asset: {assetId}, Layer: {layerId}", "Incoming data from opener");
+                    // Defer showing the popup until after the main window is visible
+                    this.Activated += App_Activated_ShowPendingPopupOnce;
+                }
+                catch
+                {
+                    // Ignore parsing errors for safety
+                }
             }
+        }
+
+        private void App_Activated_ShowPendingPopupOnce(object? sender, EventArgs e)
+        {
+            if (_hasShownPendingPopup)
+            {
+                this.Activated -= App_Activated_ShowPendingPopupOnce;
+                return;
+            }
+
+            // Ensure we only attempt once and allow UI to settle
+            _hasShownPendingPopup = true;
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(600) };
+            timer.Tick += (s, args) =>
+            {
+                timer.Stop();
+                this.Activated -= App_Activated_ShowPendingPopupOnce;
+
+                if (!string.IsNullOrWhiteSpace(_pendingAssetId) || !string.IsNullOrWhiteSpace(_pendingLayerId))
+                {
+                    ShowAssetLayerPopup(_pendingAssetId ?? string.Empty, _pendingLayerId ?? string.Empty);
+                }
+
+                _pendingAssetId = null;
+                _pendingLayerId = null;
+            };
+            timer.Start();
         }
 
         private void InitSingalRServer()
@@ -86,6 +128,49 @@ namespace KGWin
                 // Resolve and retain a hub context for server-side sends
                 _hubContext = _webApp.Services.GetRequiredService<IHubContext<CommunicationHub>>();
             });
+        }
+
+        private void ShowAssetLayerPopup(string assetId, string layerId)
+        {
+            // Create a detailed popup message
+            string popupMessage = $"🎯 **Asset & Layer Data Received**\n\n" +
+                                $"📊 **Asset Information:**\n" +
+                                $"   • Asset ID: {assetId}\n" +
+                                $"   • Asset Name: {GetAssetDisplayName(assetId)}\n\n" +
+                                $"🗺️ **Layer Information:**\n" +
+                                $"   • Layer ID: {layerId}\n" +
+                                $"   • Layer Name: {GetLayerDisplayName(layerId)}\n\n" +
+                                $"⏰ **Received at:** {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n\n" +
+                                $"✅ **Status:** Successfully launched from KGWeb application";
+
+            MessageBox.Show(popupMessage, "KGWin - Data Received from Web Application", 
+                          MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private string GetAssetDisplayName(string assetId)
+        {
+            return assetId switch
+            {
+                "ASSET_001" => "Main Building",
+                "ASSET_002" => "Warehouse A",
+                "ASSET_003" => "Office Complex",
+                "ASSET_004" => "Parking Garage",
+                "ASSET_005" => "Maintenance Shed",
+                _ => "Unknown Asset"
+            };
+        }
+
+        private string GetLayerDisplayName(string layerId)
+        {
+            return layerId switch
+            {
+                "LAYER_001" => "Building Footprint",
+                "LAYER_002" => "Electrical Systems",
+                "LAYER_003" => "Plumbing Network",
+                "LAYER_004" => "HVAC Systems",
+                "LAYER_005" => "Security Cameras",
+                _ => "Unknown Layer"
+            };
         }
 
         private void StartNativeMessagingLoop()

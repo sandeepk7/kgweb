@@ -176,16 +176,16 @@ export class Home implements OnInit, OnDestroy {
             </h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
-                     <div class="modal-body">
-             <div class="row">
-               <div class="col-12">
-                 <div class="text-center">
-                   <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
-                   <h4 class="mt-3">${data.message}</h4>
-                   <p class="text-muted">Connected at: ${data.timestamp}</p>
-                 </div>
-               </div>
-             </div>
+                               <div class="modal-body">
+            <div class="row">
+              <div class="col-12">
+                <div class="text-center">
+                  <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                  <h4 class="mt-3">KGWin Desktop Application Connected Successfully</h4>
+                  <p class="text-muted">Connected at: ${data.timestamp || 'Unknown'}</p>
+                </div>
+              </div>
+            </div>
             <div class="mt-3">
               <h6><i class="fas fa-code me-2"></i>Raw JSON Data</h6>
               <pre class="bg-light p-3 rounded"><code>${JSON.stringify(data, null, 2)}</code></pre>
