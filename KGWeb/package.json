@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
-    "build:gh-pages": "ng build --configuration production --output-path=../docs --base-href=/kgweb/ --deploy-url=/kgweb/ --delete-output-path && npm run move-files",
+    "build:gh-pages": "ng build --configuration production --output-path=../docs --base-href=/kgweb/ --delete-output-path && npm run move-files",
     "move-files": "powershell -Command \"if (Test-Path '../docs/browser') { Move-Item '../docs/browser/*' '../docs/' -Force; Remove-Item '../docs/browser' -Recurse }\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
