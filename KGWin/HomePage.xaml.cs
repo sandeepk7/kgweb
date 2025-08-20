@@ -41,13 +41,8 @@ namespace KGWin
                 // Create data to pass to KGWeb
                 var kgWinData = new
                 {
-                    timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    application = "KGWin Desktop",
-                    version = "1.0",
-                    features = new[] { "Offline Maps", "SignalR Communication", "Browser Extension Support" },
-                    status = "Running",
-                    user = Environment.UserName,
-                    machine = Environment.MachineName
+                    message = "KGWin Desktop Application Connected Successfully",
+                    timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                 };
 
                 // Convert to JSON and URL encode

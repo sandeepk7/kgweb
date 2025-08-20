@@ -38,7 +38,7 @@ namespace KGWin
 
             if (e.Args.Length > 0)
             {
-                string protocolUrl = e.Args[0]; // e.g., kgwinapp://openmap?assetId=123&layerId=456
+                string protocolUrl = e.Args[0]; // e.g., kgwin://launch?assetId=123&layerId=456
 
                 Uri uri = new Uri(protocolUrl);
                 string assetId = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("assetId");

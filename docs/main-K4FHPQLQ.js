@@ -14,26 +14,16 @@ ${n.map((r,o)=>`${o+1}) ${r.toString()}`).join(`
             </h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-md-6">
-                <h6><i class="fas fa-info-circle me-2"></i>Application Info</h6>
-                <ul class="list-unstyled">
-                  <li><strong>Application:</strong> ${e.application}</li>
-                  <li><strong>Version:</strong> ${e.version}</li>
-                  <li><strong>Status:</strong> <span class="badge bg-success">${e.status}</span></li>
-                  <li><strong>User:</strong> ${e.user}</li>
-                  <li><strong>Machine:</strong> ${e.machine}</li>
-                  <li><strong>Timestamp:</strong> ${e.timestamp}</li>
-                </ul>
-              </div>
-              <div class="col-md-6">
-                <h6><i class="fas fa-list me-2"></i>Features</h6>
-                <ul class="list-unstyled">
-                  ${e.features.map(i=>`<li><i class="fas fa-check text-success me-2"></i>${i}</li>`).join("")}
-                </ul>
-              </div>
-            </div>
+                     <div class="modal-body">
+             <div class="row">
+               <div class="col-12">
+                 <div class="text-center">
+                   <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                   <h4 class="mt-3">${e.message}</h4>
+                   <p class="text-muted">Connected at: ${e.timestamp}</p>
+                 </div>
+               </div>
+             </div>
             <div class="mt-3">
               <h6><i class="fas fa-code me-2"></i>Raw JSON Data</h6>
               <pre class="bg-light p-3 rounded"><code>${JSON.stringify(e,null,2)}</code></pre>

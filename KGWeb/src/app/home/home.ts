@@ -176,26 +176,16 @@ export class Home implements OnInit, OnDestroy {
             </h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-md-6">
-                <h6><i class="fas fa-info-circle me-2"></i>Application Info</h6>
-                <ul class="list-unstyled">
-                  <li><strong>Application:</strong> ${data.application}</li>
-                  <li><strong>Version:</strong> ${data.version}</li>
-                  <li><strong>Status:</strong> <span class="badge bg-success">${data.status}</span></li>
-                  <li><strong>User:</strong> ${data.user}</li>
-                  <li><strong>Machine:</strong> ${data.machine}</li>
-                  <li><strong>Timestamp:</strong> ${data.timestamp}</li>
-                </ul>
-              </div>
-              <div class="col-md-6">
-                <h6><i class="fas fa-list me-2"></i>Features</h6>
-                <ul class="list-unstyled">
-                  ${data.features.map((feature: string) => `<li><i class="fas fa-check text-success me-2"></i>${feature}</li>`).join('')}
-                </ul>
-              </div>
-            </div>
+                     <div class="modal-body">
+             <div class="row">
+               <div class="col-12">
+                 <div class="text-center">
+                   <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                   <h4 class="mt-3">${data.message}</h4>
+                   <p class="text-muted">Connected at: ${data.timestamp}</p>
+                 </div>
+               </div>
+             </div>
             <div class="mt-3">
               <h6><i class="fas fa-code me-2"></i>Raw JSON Data</h6>
               <pre class="bg-light p-3 rounded"><code>${JSON.stringify(data, null, 2)}</code></pre>
