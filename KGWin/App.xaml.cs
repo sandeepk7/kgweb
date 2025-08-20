@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using System.Windows.Threading;
+using System.Threading;
 
 namespace KGWin
 {
@@ -31,9 +32,45 @@ namespace KGWin
         private string? _pendingAssetId;
         private string? _pendingLayerId;
         private bool _hasShownPendingPopup;
+        
+        // Mutex for single instance
+        private static Mutex? _singleInstanceMutex;
+        private static bool _isFirstInstance = true;
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Check for single instance
+            _singleInstanceMutex = new Mutex(true, "KGWinSingleInstance", out _isFirstInstance);
+            
+            if (!_isFirstInstance)
+            {
+                // Another instance is already running
+                System.Diagnostics.Debug.WriteLine("=== KGWin: Another instance detected ===");
+                
+                // Handle protocol arguments by sending them to the existing instance
+                if (e.Args.Length > 0)
+                {
+                    try
+                    {
+                        string protocolUrl = e.Args[0];
+                        Uri uri = new Uri(protocolUrl);
+                        string assetId = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("assetId") ?? string.Empty;
+                        string layerId = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("layerId") ?? string.Empty;
+                        
+                        // Send data to existing instance via SignalR or other IPC method
+                        SendDataToExistingInstance(assetId, layerId);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error handling protocol in existing instance: {ex.Message}");
+                    }
+                }
+                
+                // Shutdown this instance
+                this.Shutdown();
+                return;
+            }
+            
             base.OnStartup(e);
             InitSingalRServer();
 
@@ -423,6 +460,43 @@ namespace KGWin
         public IHubContext<CommunicationHub>? GetHubContext()
         {
             return _hubContext;
+        }
+        
+        private void SendDataToExistingInstance(string assetId, string layerId)
+        {
+            try
+            {
+                // For now, we'll use a simple approach: bring the existing window to front
+                // and show the popup there. In a more sophisticated implementation,
+                // you could use named pipes, memory mapped files, or other IPC methods.
+                
+                // Bring the main window to front
+                if (this.MainWindow != null)
+                {
+                    this.MainWindow.Activate();
+                    this.MainWindow.WindowState = WindowState.Normal;
+                    this.MainWindow.Show();
+                }
+                
+                // Show the popup in the existing instance
+                ShowAssetLayerPopup(assetId, layerId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error sending data to existing instance: {ex.Message}");
+            }
+        }
+        
+        protected override void OnExit(ExitEventArgs e)
+        {
+            // Clean up the mutex
+            if (_singleInstanceMutex != null)
+            {
+                _singleInstanceMutex.ReleaseMutex();
+                _singleInstanceMutex.Dispose();
+            }
+            
+            base.OnExit(e);
         }
     }
 }
