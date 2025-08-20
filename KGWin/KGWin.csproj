@@ -21,5 +21,23 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  
+  <!-- Preserve custom files during publishing -->
+  <ItemGroup>
+    <Content Include="register-protocol.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- Publish Configuration -->
+  <PropertyGroup>
+    <PublishDir>D:\Work\Office\Damco\KloudGin\Deployed\KGWin\</PublishDir>
+    <PublishProtocol>FileSystem</PublishProtocol>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <RuntimeIdentifiers>win-x64;win-x86;win-arm64</RuntimeIdentifiers>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
 
 </Project>

@@ -4,7 +4,7 @@
 
 ### **Successfully Deployed:**
 - ✅ **KGWeb Angular Application** → `D:\Work\Office\Damco\KloudGin\Repositories\KGWin\docs\`
-- ✅ **KGWin Desktop Application** → `D:\Work\Office\Damco\Deployed\KGWin\`
+- ✅ **KGWin Desktop Application** → `D:\Work\Office\Damco\KloudGin\Deployed\KGWin\`
 - ✅ **GitHub Pages Ready** → `https://sandeepk7.github.io/kgweb/`
 
 ---
@@ -37,7 +37,7 @@ npm run build:gh-pages
 cd KGWin
 
 # Publish for Release
-dotnet publish -c Release -o "D:\Work\Office\Damco\Deployed\KGWin"
+dotnet publish -c Release -o "D:\Work\Office\Damco\KloudGin\Deployed\KGWin"
 ```
 
 **What this does:**
@@ -49,7 +49,7 @@ dotnet publish -c Release -o "D:\Work\Office\Damco\Deployed\KGWin"
 
 ```bash
 # Run as Administrator
-D:\Work\Office\Damco\Deployed\KGWin\register-protocol.bat
+D:\Work\Office\Damco\KloudGin\Deployed\KGWin\register-protocol.bat
 ```
 
 **What this does:**
@@ -79,7 +79,7 @@ D:\Work\Office\Damco\Deployed\KGWin\register-protocol.bat
    - Right-click on `KGWin` project
    - Select **Publish**
    - Choose **Folder** as publish target
-   - Set **Target location** to: `D:\Work\Office\Damco\Deployed\KGWin`
+   - Set **Target location** to: `D:\Work\Office\Damco\KloudGin\Deployed\KGWin`
    - Click **Publish**
 
 #### **Method 2: Using Visual Studio Command Line**
@@ -91,7 +91,7 @@ cd "D:\Work\Office\Damco\KloudGin\Repositories\KGWin"
 
 # Build and publish
 msbuild KGWin.sln /p:Configuration=Release /p:Platform="Any CPU"
-dotnet publish KGWin/KGWin.csproj -c Release -o "D:\Work\Office\Damco\Deployed\KGWin"
+dotnet publish KGWin/KGWin.csproj -c Release -o "D:\Work\Office\Damco\KloudGin\Deployed\KGWin"
 ```
 
 ### **For KGWeb Angular Application:**
@@ -164,12 +164,12 @@ dotnet publish KGWin/KGWin.csproj -c Release -o "D:\Work\Office\Damco\Deployed\K
 ### **1. Register Custom Protocol (One-time)**
 ```bash
 # Run as Administrator
-D:\Work\Office\Damco\Deployed\KGWin\register-protocol.bat
+D:\Work\Office\Damco\KloudGin\Deployed\KGWin\register-protocol.bat
 ```
 
 ### **2. Test Deployment**
 1. **Web Application**: Visit `https://sandeepk7.github.io/kgweb/`
-2. **Desktop Application**: Run `D:\Work\Office\Damco\Deployed\KGWin\KGWin.exe`
+2. **Desktop Application**: Run `D:\Work\Office\Damco\KloudGin\Deployed\KGWin\KGWin.exe`
 3. **Deep Linking**: Click "Launch KGWin Application" in web app
 
 ### **3. Verify Functionality**
@@ -191,7 +191,7 @@ D:\Work\Office\Damco\KloudGin\Repositories\KGWin\
 │   ├── assets\
 │   └── *.js, *.css files
 │
-└── D:\Work\Office\Damco\Deployed\KGWin\  # Desktop App
+└── D:\Work\Office\Damco\KloudGin\Deployed\KGWin\  # Desktop App
     ├── KGWin.exe
     ├── KGWin.dll
     ├── appsettings.json
