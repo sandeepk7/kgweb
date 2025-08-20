@@ -58,13 +58,16 @@ namespace KGWin
 
                 builder.Services.AddSignalR();
 
-                // Enable CORS for Angular dev server
+                // Enable CORS for Angular dev server and GitHub Pages
                 builder.Services.AddCors(options =>
                 {
                     options.AddPolicy("AllowAngularDevClient",
                         policy =>
                         {
-                            policy.WithOrigins("http://localhost:4200") // Angular dev server
+                            policy.WithOrigins(
+                                    "http://localhost:4200", // Angular dev server
+                                    "https://sandeepk7.github.io" // GitHub Pages
+                                  )
                                   .AllowAnyHeader()
                                   .AllowAnyMethod()
                                   .AllowCredentials();

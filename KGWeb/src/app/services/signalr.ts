@@ -175,6 +175,13 @@ export class SignalRService {
     this.reconnectInterval = interval;
   }
 
+  /**
+   * Get the current connection status
+   */
+  public getConnectionStatus(): boolean {
+    return this.connectionStatus.value;
+  }
+
   // Send asset location data to WPF app
   public async sendAssetLocation(asset: AssetLocation): Promise<void> {
     try {
