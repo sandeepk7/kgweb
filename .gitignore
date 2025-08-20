@@ -608,6 +608,10 @@ Thumbs.db
 *.sln
 !KGWin.sln
 
+# GIS/ArcGIS Runtime files
+*.vtpk
+*.mmpk
+
 # User-specific files
 *.user
 *.userosscache
