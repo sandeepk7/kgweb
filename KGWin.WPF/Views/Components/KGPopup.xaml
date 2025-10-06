@@ -7,7 +7,13 @@
              xmlns:components="clr-namespace:KGWin.WPF.Views.Components"
              xmlns:local="clr-namespace:KGWin.WPF.Views.Components"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             HorizontalAlignment="Left"
+             VerticalAlignment="Top"
+             x:Name="KGPopupRoot"
+             d:DesignHeight="450" 
+             d:DesignWidth="800"
+             Width="{Binding Width}"
+             Height="{Binding Height}">
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <DropShadowEffect x:Key="DropShadowEffect" 
@@ -16,13 +22,14 @@
                    ShadowDepth="2" 
                    Opacity="0.3"/>
     </UserControl.Resources>
+    <UserControl.RenderTransform>
+        <TranslateTransform X="{Binding X}" Y="{Binding Y}"/>
+    </UserControl.RenderTransform>
     <Grid>
         <Border 
-Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"              
-Effect="{StaticResource DropShadowEffect}"
-Background="#ffffff"
-MaxWidth="{Binding Width}"
-MaxHeight="{Binding Height}">
+            Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"              
+            Effect="{StaticResource DropShadowEffect}"
+            Background="#ffffff">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -44,7 +51,7 @@ MaxHeight="{Binding Height}">
     Margin="0,1,1,0"/>
 
                 <Border Grid.Row="1">
-                    <ContentPresenter Content="{Bidning Body, ElementName=Root}" />
+                    <ContentPresenter Content="{Binding Body, ElementName=KGPopupRoot}"/>
                 </Border>
 
                 <Border Grid.Row="2" Background="#E5E7EB" Height="1" />

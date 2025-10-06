@@ -53,7 +53,7 @@ namespace KGWin.WPF.Services
             services.AddTransient<ModalPopupViewModel>();
             services.AddTransient<KGPopupViewModel>();
             services.AddTransient<KGButtonViewModel>();
-
+            services.AddTransient<KGLabelValueViewModel>();
         }    
     }
 }

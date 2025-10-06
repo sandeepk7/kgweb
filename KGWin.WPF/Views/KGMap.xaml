@@ -9,6 +9,7 @@
              xmlns:converters="clr-namespace:KGWin.WPF.Converters"
              xmlns:local="clr-namespace:KGWin.WPF.Views"
              mc:Ignorable="d" 
+             x:Name="KGMapRoot"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <vm:ViewModelLocator x:Key="Locator" />
@@ -36,10 +37,29 @@
                 Map="{Binding Map}" 
                 GeoViewTapped="MapView_GeoViewTapped" />
         </Border>
-        <Border Grid.Row="0" Grid.Column="1">
+        <Border Grid.Row="0" 
+                Grid.Column="1" >
             <component:KGPopup DataContext="{Binding KGPopupViewModel}">
-                <TextBlock>Hello</TextBlock>
+                <component:KGPopup.Body>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding BodyData}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="12" FontWeight="Medium" Foreground="#6B7280" Padding="8 0 8 0"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Value}" FontSize="14" Foreground="#111827" TextAlignment="Right" HorizontalAlignment="Right" Margin="0,0,12,0" Padding="8 0 8 0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </component:KGPopup.Body>
             </component:KGPopup>
-        </Border>        
+        </Border>
     </Grid>
 </UserControl>

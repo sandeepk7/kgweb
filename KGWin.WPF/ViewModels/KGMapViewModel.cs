@@ -30,6 +30,7 @@ namespace KGWin.WPF.ViewModels
 
             var _ = InitializeAsync(_mapConfig);
             _kgPopupViewModel = popupViewModel;
+            //_kgPopupViewModel.BodyData = PopupRows;
         }
 
         private IConfiguration _configuration;
@@ -103,6 +104,17 @@ namespace KGWin.WPF.ViewModels
             PopupRows.Clear();
 
             var fields = await _arcGisService.ExtractMapObjectDataOnClickPoint(mapView, e.Position, KGPopupViewModel);
+            var fieldsKeys = fields.Keys.ToList();
+
+            fieldsKeys.ForEach(key =>
+            {
+                var labelValueVM = App.Services.GetRequiredService<KGLabelValueViewModel>();
+                labelValueVM.Label = key;
+                labelValueVM.Value = fields[key];
+                PopupRows.Add(labelValueVM);                
+            });
+
+            KGPopupViewModel.BodyData = PopupRows;
 
             List<string> buttonConents = new()
             {
