@@ -1,0 +1,31 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Import ArcGIS CSS for proper map display */
+@import '@arcgis/core/assets/esri/themes/light/main.css';
+
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scroll from global overflow */
+}
+
+html {
+  overflow-x: hidden; /* Ensure viewport doesn't allow x-overflow (100vw issues) */
+}
+
+/* Common fix: if any wrapper uses 100vw, prefer 100% to avoid extra width */
+[data-viewport-width], .viewport-width {
+  width: 100%;
+}
+
+/* Ensure map container has proper dimensions */
+.esri-view {
+  height: 100%;
+  width: 100%;
+}

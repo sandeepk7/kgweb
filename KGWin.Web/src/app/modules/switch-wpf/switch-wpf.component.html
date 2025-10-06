@@ -1,0 +1,75 @@
+<div class="switch-wpf-container">
+  <div class="switch-wpf-content">
+    <div class="header">
+      <h1>Switch To WPF</h1>
+      <p>Choose how you want to switch to the WPF Map application</p>
+    </div>
+
+    <div class="buttons-section">
+      <!-- Delayed Switch Button -->
+      <div class="button-group">
+        <button 
+          class="btn btn-primary btn-large" 
+          (click)="onSwitchWithDelay()"
+          [disabled]="isCountingDown">
+          <span *ngIf="!isCountingDown">Switch to WPF Map (10s delay)</span>
+          <span *ngIf="isCountingDown">Switching in {{ countdown }} seconds...</span>
+        </button>
+        
+        <button 
+          *ngIf="isCountingDown"
+          class="btn btn-secondary btn-small" 
+          (click)="onCancelCountdown()">
+          Cancel
+        </button>
+      </div>
+
+      <!-- Instant Switch Button -->
+      <div class="button-group">
+        <button 
+          class="btn btn-success btn-large" 
+          (click)="onSwitchInstantly()"
+          [disabled]="isCountingDown">
+          Switch to WPF Map (Instant)
+        </button>
+      </div>
+
+      <!-- Close WPF Popups Button -->
+      <div class="button-group">
+        <button 
+          class="btn btn-warning btn-large" 
+          (click)="onCloseWpfPopups()">
+          Close WPF Popups
+        </button>
+      </div>
+
+      <!-- Popup State Test Buttons -->
+      <div class="button-group">
+        <button class="btn btn-secondary btn-small" (click)="onMinimizePopup()">Minimize Last Popup</button>
+        <button class="btn btn-secondary btn-small" (click)="onRestorePopup()" style="margin-left:8px">Restore Last Popup</button>
+        <button class="btn btn-secondary btn-small" (click)="onMaximizePopup()" style="margin-left:8px">Maximize Last Popup</button>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-card">
+        <h3>Delayed Switch</h3>
+        <p>This option will switch to the WPF Map page after a 10-second countdown. You can cancel the countdown at any time.</p>
+      </div>
+      
+      <div class="info-card">
+        <h3>Instant Switch</h3>
+        <p>This option will immediately switch to the WPF Map page without any delay.</p>
+      </div>
+    </div>
+
+    <div class="status-section" *ngIf="isCountingDown">
+      <div class="countdown-display">
+        <div class="countdown-circle">
+          <span class="countdown-number">{{ countdown }}</span>
+        </div>
+        <p>Switching to WPF Map in {{ countdown }} seconds...</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<div class="communication-section">
+    <div class="communication-header">
+        <h3>Communication</h3>
+        <div class="connection-status" [class.connected]="isConnected">
+            {{ isConnected ? '🟢 Connected to WPF' : '🔴 Disconnected' }}
+        </div>
+    </div>
+    <div class="communication-container">
+        <div class="messages-area" #messagesArea>
+            <div *ngFor="let message of messages" class="message" 
+                [class.user-message]="message.sender === 'user'"
+                [class.wpf-message]="message.sender === 'wpf'"
+                [style.display]="message.sender === 'system' ? 'none' : 'flex'">
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="sender-name">{{ message.sender === 'user' ? 'You' : 'WPF' }}</span>
+                        <span class="message-time">{{ message.timestamp | date:'HH:mm:ss' }}</span>
+                    </div>
+                    <div class="message-text" [class.json-text]="message.isJson">
+                        <pre *ngIf="message.isJson">{{ message.text }}</pre>
+                        <span *ngIf="!message.isJson">{{ message.text }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <textarea [(ngModel)]="newMessage" (keydown.enter)="sendMessage()" placeholder="Type your message..."
+                class="message-input" rows="3"></textarea>
+        </div>
+    </div>
+    
+    <div class="communication-footer">
+        <button (click)="addRandomAssets()" class="assets-button">Add Assets</button>
+        <button (click)="addRandomMarkers()" class="markers-button">Add Markers</button>
+        <button (click)="clearCommunication()" class="clear-button">Clear Communication</button>
+        <button (click)="sendMessage()" [disabled]="!newMessage.trim()" class="send-button">Send</button>
+    </div>
+</div>

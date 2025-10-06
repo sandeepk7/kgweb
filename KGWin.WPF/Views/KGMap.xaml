@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="KGWin.WPF.Views.KGMap"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
+             xmlns:vm="clr-namespace:KGWin.WPF.ViewModels"
+             xmlns:component="clr-namespace:KGWin.WPF.Views.Components"
+             xmlns:converters="clr-namespace:KGWin.WPF.Converters"
+             xmlns:local="clr-namespace:KGWin.WPF.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <vm:ViewModelLocator x:Key="Locator" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <UserControl.DataContext>
+        <Binding Source="{StaticResource Locator}" Path="MapViewModel" />
+    </UserControl.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Border Grid.Row="0" Grid.Column="0" Visibility="{Binding MapConfig.LoadLayers, Converter={StaticResource BoolToVisibilityConverter}}">
+            <local:MapLayerManager DataContext="{Binding}"/>
+        </Border>
+        <Border Grid.Row="0" Grid.Column="1">
+            <esri:MapView 
+                x:Name="KGMapView"
+                Map="{Binding Map}" 
+                GeoViewTapped="MapView_GeoViewTapped" />
+        </Border>
+        <Border Grid.Row="0" Grid.Column="1">
+            <component:KGPopup DataContext="{Binding KGPopupViewModel}">
+                <TextBlock>Hello</TextBlock>
+            </component:KGPopup>
+        </Border>        
+    </Grid>
+</UserControl>

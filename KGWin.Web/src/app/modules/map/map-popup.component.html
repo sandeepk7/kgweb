@@ -1,0 +1,83 @@
+<div class="map-popup" *ngIf="isVisible">
+  <div class="popup-content">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-title-section">
+        <h3 class="popup-title">{{ popupData.title }}</h3>
+        <span class="popup-type">{{ popupData.type.toUpperCase() }}</span>
+      </div>
+      <button class="close-button" (click)="onClose()">×</button>
+    </div>
+
+    <!-- Content -->
+    <div class="popup-body">
+      <!-- Basic Information -->
+      <div class="info-section">
+        <h4 class="section-title">Basic Information</h4>
+        
+        <div class="info-row">
+          <label class="info-label">ID:</label>
+          <span class="info-value">{{ popupData.id }}</span>
+        </div>
+        
+        <div class="info-row">
+          <label class="info-label">Type:</label>
+          <span class="info-value">{{ popupData.type }}</span>
+        </div>
+        
+        <div class="info-row">
+          <label class="info-label">Color:</label>
+          <span class="info-value">{{ popupData.color }}</span>
+        </div>
+        
+        <div class="info-row">
+          <label class="info-label">Location:</label>
+          <span class="info-value">
+            Longitude: {{ popupData.longitude | number:'1.4-4' }}<br>
+            Latitude: {{ popupData.latitude | number:'1.4-4' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Editable Fields -->
+      <div class="editable-section">
+        <div class="form-group">
+          <label class="form-label">Description:</label>
+          <textarea 
+            class="form-input" 
+            rows="3"
+            [(ngModel)]="editedData.description"
+            placeholder="Enter description..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Status:</label>
+          <input 
+            type="text" 
+            class="form-input"
+            [(ngModel)]="editedData.status"
+            placeholder="Enter status...">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Notes:</label>
+          <textarea 
+            class="form-input" 
+            rows="4"
+            [(ngModel)]="editedData.notes"
+            placeholder="Enter notes..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="popup-footer">
+      <button class="btn btn-secondary" (click)="onOpenWpfMap()">Open WPF Map</button>
+      <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+      <button class="btn btn-primary" (click)="onSave()">Save</button>
+    </div>
+  </div>
+</div>
+
+
+
