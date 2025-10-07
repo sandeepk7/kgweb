@@ -1,33 +1,40 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SwitchWpfService {
-
-  constructor() { }
+  constructor() {}
 
   switchToWpfMap(): void {
     try {
       // Check if the WPF communication service is available
-      if ((window as any).communicationService && (window as any).communicationService.switchToWpfMap) {
+      if (
+        (window as any).communicationService &&
+        (window as any).communicationService.switchToWpfMap
+      ) {
         (window as any).communicationService.switchToWpfMap();
         console.log('Switching to WPF Map page...');
       } else {
         // Fallback: try to open WPF map popup as an alternative
-        if ((window as any).communicationService && (window as any).communicationService.openWpfMapPopup) {
+        if (
+          (window as any).communicationService &&
+          (window as any).communicationService.openWpfMapPopup
+        ) {
           const defaultData = {
             title: 'Switch to WPF Map',
             type: 'navigation',
             longitude: 0,
             latitude: 0,
-            description: 'Switched from Angular application'
+            description: 'Switched from Angular application',
           };
           (window as any).communicationService.openWpfMapPopup(JSON.stringify(defaultData));
           console.log('Opening WPF map popup as fallback...');
         } else {
           console.error('WPF communication service not available');
-          alert('WPF communication service not available. Please ensure the WPF application is running.');
+          alert(
+            'WPF communication service not available. Please ensure the WPF application is running.'
+          );
         }
       }
     } catch (error) {
@@ -38,7 +45,10 @@ export class SwitchWpfService {
 
   closeAllWpfPopups(): void {
     try {
-      if ((window as any).communicationService && (window as any).communicationService.closeAllPopups) {
+      if (
+        (window as any).communicationService &&
+        (window as any).communicationService.closeAllPopups
+      ) {
         (window as any).communicationService.closeAllPopups();
         console.log('Requested WPF to close all popups.');
       } else {

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
         xmlns:local="clr-namespace:KGWin.WPF"
+        
         xmlns:views="clr-namespace:KGWin.WPF.Views"
         xmlns:components="clr-namespace:KGWin.WPF.Views.Components"
         xmlns:vm="clr-namespace:KGWin.WPF.ViewModels"

@@ -1,41 +1,35 @@
 ﻿using KGWin.WPF.Interfaces;
-using KGWin.WPF.Models;
-using System.Text.Json;
-using Microsoft.Web.WebView2.Wpf;
+using Microsoft.Extensions.Configuration;
 
 namespace KGWin.WPF.Services
 {
-    public class CommunicationService : ICommunicationService
+    public partial class CommunicationService : ICommunicationService
     {
-        public CommunicationService(IWebRequestProcessor requestProcessor)
+        public CommunicationService(
+            IConfiguration configuration,
+            IWebRequestProcessor requestProcessor)
         {
+            _configuration = configuration;
             _requestProcessor = requestProcessor;
+
+            if (bool.TryParse(_configuration["Web:UseCefSharp"], out bool useCefSharp))
+            {
+                _useCefSharp = useCefSharp;
+            }
         }
 
         private IWebRequestProcessor _requestProcessor;
-        private WebView2? _kgWebView;
+        private IConfiguration _configuration;
+        private bool _useCefSharp;
 
-        //public void Initialize(CefSharp browser)
-        //{
-        //}
-
-        public void Initialize(WebView2 kgWebView)
+        public async Task RaiseCreateWorkOrderAsync(string workOrderData)
         {
-            _kgWebView = kgWebView;
-
-            _kgWebView.CoreWebView2.WebMessageReceived += (sender, args) =>
-            {                
-                if (!string.IsNullOrWhiteSpace(args.WebMessageAsJson))
-                {
-                    _requestProcessor.ProcessRequestAsync(args.WebMessageAsJson);
-                }
-            };
-        }
-
-        public async Task RaiseCreateWorkOrder(string workOrderData)
-        {
-            if (_kgWebView != null) {                
-                await _kgWebView.CoreWebView2.ExecuteScriptAsync($"requestFromWpf({JSRequestType.CreateWorkOrder},'{workOrderData}')");
+            if (_useCefSharp)
+            {
+            }
+            else
+            {
+                await RaiseCreateWorkOrderWebViewAsync(workOrderData);
             }
         }
     }

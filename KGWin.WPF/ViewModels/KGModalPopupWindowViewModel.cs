@@ -3,9 +3,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace KGWin.WPF.ViewModels
 {
-    public class ModalPopupWindowViewModel : ViewModelBase
+    public class KGModalPopupWindowViewModel : ViewModelBase
     {
-        public ModalPopupWindowViewModel()
+        public KGModalPopupWindowViewModel()
         {
             _title = "Modal Popup Window";
         }

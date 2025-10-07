@@ -7,8 +7,9 @@ import { SwitchWpfService } from './switch-wpf.service';
   templateUrl: './switch-wpf.component.html',
   styleUrls: ['./switch-wpf.component.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
+
 export class SwitchWpfComponent implements OnInit, OnDestroy {
   countdown = 10;
   isCountingDown = false;
@@ -24,28 +25,6 @@ export class SwitchWpfComponent implements OnInit, OnDestroy {
     this.clearCountdown();
   }
 
-  onSwitchWithDelay(): void {
-    if (this.isCountingDown) {
-      return; // Prevent multiple countdowns
-    }
-
-    this.isCountingDown = true;
-    this.countdown = 10;
-
-    this.countdownInterval = setInterval(() => {
-      this.countdown--;
-      
-      if (this.countdown <= 0) {
-        this.clearCountdown();
-        this.switchToWpfMap();
-      }
-    }, 1000);
-  }
-
-  onSwitchInstantly(): void {
-    this.clearCountdown();
-    this.switchToWpfMap();
-  }
 
   onCancelCountdown(): void {
     this.clearCountdown();
@@ -59,11 +38,7 @@ export class SwitchWpfComponent implements OnInit, OnDestroy {
     this.isCountingDown = false;
     this.countdown = 10;
   }
-
-  private switchToWpfMap(): void {
-    this.switchWpfService.switchToWpfMap();
-  }
-
+  
   onCloseWpfPopups(): void {
     this.switchWpfService.closeAllWpfPopups();
   }

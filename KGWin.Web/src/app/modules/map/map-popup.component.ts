@@ -19,7 +19,7 @@ export interface MapPopupData {
   templateUrl: './map-popup.component.html',
   styleUrls: ['./map-popup.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
 })
 export class MapPopupComponent {
   @Input() isVisible: boolean = false;
@@ -32,7 +32,7 @@ export class MapPopupComponent {
     latitude: 0,
     description: '',
     status: '',
-    notes: ''
+    notes: '',
   };
 
   @Output() close = new EventEmitter<void>();
@@ -60,7 +60,7 @@ export class MapPopupComponent {
     this.close.emit();
   }
 
-    onOpenWpfMap(): void {
+  onOpenWpfMap(): void {
     try {
       // Create the popup data to pass to the WPF application
       const popupData = {
@@ -72,12 +72,12 @@ export class MapPopupComponent {
         latitude: this.editedData.latitude,
         description: this.editedData.description,
         status: this.editedData.status,
-        notes: this.editedData.notes
+        notes: this.editedData.notes,
       };
 
       // Convert to JSON
       const jsonData = JSON.stringify(popupData);
-      
+
       // Call the WPF method
       if (typeof (window as any).communicationService !== 'undefined') {
         (window as any).communicationService.openWpfMapPopup(jsonData);
@@ -86,12 +86,9 @@ export class MapPopupComponent {
       }
     } catch (error) {
       console.error('Error opening WPF map:', error);
-      alert('Error opening WPF map. Please make sure the WPF application is installed and running.');
+      alert(
+        'Error opening WPF map. Please make sure the WPF application is installed and running.'
+      );
     }
   }
-
-  
 }
-
-
-

@@ -50,8 +50,8 @@ namespace KGWin.WPF.Services
         {
             services.AddTransient<KGWebViewModel>();
             services.AddTransient<KGMapViewModel>();
-            services.AddTransient<LayerItemViewModel>();
-            services.AddTransient<ModalPopupWindowViewModel>();
+            services.AddTransient<KGLayerItemViewModel>();
+            services.AddTransient<KGModalPopupWindowViewModel>();
             services.AddTransient<KGPopupViewModel>();
             services.AddTransient<KGButtonViewModel>();
             services.AddTransient<KGLabelValueViewModel>();

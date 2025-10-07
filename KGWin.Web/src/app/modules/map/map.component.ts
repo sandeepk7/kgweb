@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MapService } from './map.service';
 import { MapPopupComponent, MapPopupData } from './map-popup.component';
 import { CommunicationComponent } from '../communication/communication.component';
+import { CommunicationService } from '../communication/communication.service';
 
 @Component({
   selector: 'app-map',
@@ -28,7 +29,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     notes: ''
   };
 
-  constructor(private mapService: MapService) {}
+  constructor(private mapService: MapService, private communicationService: CommunicationService) { }
 
   ngOnInit(): void {
     // Component initialization
@@ -51,26 +52,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   openNaperville(): void {
-    try {
-      // Check if the WPF communication service is available
-      if ((window as any).communicationService && (window as any).communicationService.openWpfMapPopup) {
-        const napervilleData = {
-          title: 'Naperville Map',
-          type: 'naperville',
-          longitude: -88.1473,
-          latitude: 41.7508,
-          description: 'Naperville utility and infrastructure data'
-        };
-        (window as any).communicationService.openWpfMapPopup(JSON.stringify(napervilleData));
-        console.log('Opening WPF Naperville popup...');
-      } else {
-        console.error('WPF communication service not available');
-        alert('WPF communication service not available. Please ensure the WPF application is running.');
-      }
-    } catch (error) {
-      console.error('Error opening WPF Naperville popup:', error);
-      alert('Error opening WPF Naperville popup. Please try again.');
-    }
+    this.communicationService.openNaperville();
   }
 
   showAssets(): void {
