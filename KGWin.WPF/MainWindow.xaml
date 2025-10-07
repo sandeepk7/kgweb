@@ -5,13 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
         xmlns:local="clr-namespace:KGWin.WPF"
-        xmlns:views="clr-namespace:KGWin.WPF.Views.Map"
+        xmlns:views="clr-namespace:KGWin.WPF.Views"
+        xmlns:components="clr-namespace:KGWin.WPF.Views.Components"
+        xmlns:vm="clr-namespace:KGWin.WPF.ViewModels"
         mc:Ignorable="d"
         Title="KGWin"  
         WindowStartupLocation="CenterScreen" 
         WindowState="Maximized"
         Background="#FAFAFA">
+    <Window.Resources>
+        <vm:ViewModelLocator x:Key="Locator" />
+    </Window.Resources>
+    <Window.DataContext>
+        <Binding Source="{StaticResource Locator}" Path="MainWindowViewModel" />
+    </Window.DataContext>
     <Grid>
-        <views:KGMap />        
+        <Grid.RowDefinitions >
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" BorderBrush="Black" Background="Blue" BorderThickness="4">
+            <components:KGButton DataContext="{Binding KGButtonViewModel}"/>
+        </Border>
+        <views:KGWeb Grid.Row="1" />
+        
     </Grid>
 </Window>

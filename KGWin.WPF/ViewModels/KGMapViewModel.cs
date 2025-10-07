@@ -182,7 +182,14 @@ namespace KGWin.WPF.ViewModels
             {
                 Uri vtpkUri = new(MapConfig.VtpkPath);
                 ArcGISVectorTiledLayer vectorTileLayer = new(vtpkUri);
-                await vectorTileLayer.LoadAsync();
+                try
+                {
+                    await vectorTileLayer.LoadAsync();
+                }
+
+                catch (Exception ex)
+                
+                { }
 
                 if (MapConfig.LoadLayers && map != null)
                 {

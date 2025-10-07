@@ -43,6 +43,7 @@ namespace KGWin.WPF.Services
             services.AddSingleton<ICommunicationService, CommunicationService>();
             services.AddTransient<IArcGisService, ArcGisService>();
             services.AddTransient<IWebRequestProcessor, WebRequestProcessor>();
+            services.AddTransient<ILoginService, LoginService>();            
         }
 
         private static void RegisterViewModels(IServiceCollection services)
@@ -54,6 +55,7 @@ namespace KGWin.WPF.Services
             services.AddTransient<KGPopupViewModel>();
             services.AddTransient<KGButtonViewModel>();
             services.AddTransient<KGLabelValueViewModel>();
+            services.AddTransient<MainWindowViewModel>();
         }    
     }
 }

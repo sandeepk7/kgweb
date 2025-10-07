@@ -10,6 +10,7 @@ namespace KGWin.WPF.ViewModels
         public ModalPopupWindowViewModel ModalPopupViewModel => App.Services.GetRequiredService<ModalPopupWindowViewModel>();
         public KGPopupViewModel PopupViewModel => App.Services.GetRequiredService<KGPopupViewModel>();
         public KGButtonViewModel KGButtonViewModel => App.Services.GetRequiredService<KGButtonViewModel>();
-        
+        public MainWindowViewModel MainWindowViewModel => App.Services.GetRequiredService<MainWindowViewModel>();
+
     }
 }

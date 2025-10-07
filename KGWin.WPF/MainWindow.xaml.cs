@@ -1,4 +1,9 @@
-﻿using System.Text;
+﻿using KGWin.WPF.Interfaces;
+using KGWin.WPF.Services;
+using KGWin.WPF.ViewModels;
+using KGWin.WPF.ViewModels.Base;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +24,14 @@ namespace KGWin.WPF
         public MainWindow()
         {
             InitializeComponent();
+            //_arcGisLoginService = arcGisLoginService;
+            //_kGButtonViewModel = kGButtonViewModel;
+            //_kGButtonViewModel.ButtonContent = "Login";
+            //_kGButtonViewModel.ButtonCommand = new RelayCommand(Login_btn);
+
         }
+        //KGButtonViewModel _kGButtonViewModel;
+        //IArcGisLoginService _arcGisLoginService;
+       
     }
 }
