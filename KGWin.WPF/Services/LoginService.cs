@@ -1,16 +1,10 @@
 ﻿using Esri.ArcGISRuntime.Security;
 using KGWin.WPF.Interfaces;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using System.Windows.Threading;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace KGWin.WPF.Services
 {
@@ -23,47 +17,13 @@ namespace KGWin.WPF.Services
             _configuration = configuration;
         }
 
-        public const string ArcGISOnlineUrl = "https://www.arcgis.com";
-
-        // - The Client ID for an app registered with the server (the ID below is for a public app created by the ArcGIS Maps SDK for Native Apps team).
-        private const string AppClientId = "xp8OFC683bqwid9O";
-
-        // - An optional client secret for the app (only needed for the OAuthClientCredentials authorization type).
-        private const string ClientSecret = "";
-
-        // - A URL for redirecting after a successful authorization (this must be a URL configured with the app).
-        public const string OAuthRedirectUrl = "https://indi45920140a2a7.maps.arcgis.com/home/index.html";
-
-
-        public static async Task<bool> EnsureAGOLCredentialAsync()
+        public static void SetChallengeHandler(IConfiguration configuration)
         {
-            Credential currentCredential = AuthenticationManager.Current.FindCredential(new Uri(ArcGISOnlineUrl), AuthenticationType.Token);
-            if (currentCredential != null)
-            {
-                return true; // already logged in
-            }
+            string LoginUrl = configuration["ArcGISLogin:ArcGISUrl"]!;
+            string ClientId = configuration["ArcGISLogin:ArcGISClientId"]!;
+            string RedirectUrl = configuration["ArcGISLogin:ArcGISOAuthRedirectUrl"]!;
 
-            try
-            {
-                var userConfig = new OAuthUserConfiguration(new Uri(ArcGISOnlineUrl), AppClientId, new Uri(OAuthRedirectUrl));
-                Credential cred = await OAuthUserCredential.CreateAsync(userConfig);
-                AuthenticationManager.Current.AddCredential(cred);
-            }
-            catch (OperationCanceledException)
-            {
-                // OAuth login was canceled, no need to display error to user.
-            }
-            catch (Exception ex)
-            {
-                // Login failure
-                MessageBox.Show("Login failed: " + ex.Message);
-            }
-            return false;
-        }
-
-        public static void SetChallengeHandler()
-        {
-            var userConfig = new OAuthUserConfiguration(new Uri(ArcGISOnlineUrl), AppClientId, new Uri(OAuthRedirectUrl));
+            var userConfig = new OAuthUserConfiguration(new Uri(LoginUrl), ClientId, new Uri(RedirectUrl));
             AuthenticationManager.Current.OAuthUserConfigurations.Add(userConfig);
             AuthenticationManager.Current.OAuthAuthorizeHandler = new OAuthAuthorize();
         }
