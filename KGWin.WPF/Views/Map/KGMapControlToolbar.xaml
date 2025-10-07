@@ -1,0 +1,239 @@
+﻿<UserControl x:Class="KGWin.WPF.Views.Map.KGMapControlToolbar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <!-- Simple icon button style -->
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#EEF2F7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <!-- Simple active icon button style -->
+        <Style x:Key="ActiveIconButton" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="Background" Value="#E5E7FF"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#EEF2F7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Right side card button style -->
+        <Style x:Key="CardIconButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="8" ShadowDepth="0" Opacity="0.06"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- MDL2 icon label -->
+        <Style x:Key="IconGlyph" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#2563EB"/>
+        </Style>
+        <Style x:Key="IconGlyphDark" TargetType="TextBlock" BasedOn="{StaticResource IconGlyph}">
+            <Setter Property="Foreground" Value="#111827"/>
+        </Style>
+
+        <!-- Vertical divider style -->
+        <Style x:Key="Divider" TargetType="Border">
+            <Setter Property="Width" Value="1"/>
+            <Setter Property="Background" Value="#E5E7EB"/>
+            <Setter Property="Margin" Value="12,0"/>
+        </Style>
+
+        <!-- Vector icon defaults -->
+        <Style x:Key="IconPath" TargetType="Path">
+            <Setter Property="Stroke" Value="#2563EB"/>
+            <Setter Property="StrokeThickness" Value="1.2"/>
+            <Setter Property="Fill" Value="Transparent"/>
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="White" CornerRadius="8" Padding="8" BorderBrush="#E5E7EB" BorderThickness="1" HorizontalAlignment="Stretch">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="0.08"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left group: search and inline tools -->
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Dropdown chevron -->
+                <Button Grid.Column="0" Style="{StaticResource IconButton}" Margin="0,0,8,0">
+                    <TextBlock Style="{StaticResource IconGlyphDark}" Text="&#xE70D;"/>
+                </Button>
+
+                <!-- Address textbox (dummy) -->
+                <Border Grid.Column="1" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="6" Background="White">
+                    <TextBox Height="32" Text="" Foreground="#6B7280" 
+                             BorderThickness="0" Background="Transparent" Padding="8,4"/>
+                </Border>
+
+                <!-- Divider -->
+                <Border Grid.Column="2" Style="{StaticResource Divider}"/>
+
+                <!-- Search -->
+                <Button Grid.Column="3" Style="{StaticResource IconButton}">
+                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE721;"/>
+                </Button>
+                <!-- Edit -->
+                <Button Grid.Column="4" Style="{StaticResource IconButton}">
+                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE70F;"/>
+                </Button>
+                <!-- Mouse pointer (vector) -->
+                <Button Grid.Column="5" Style="{StaticResource IconButton}">
+                    <Path Style="{StaticResource IconPath}" Fill="#2563EB" StrokeThickness="0"
+                          Data="M2,2 L2,18 L6.5,14.5 L10.5,22 L14,20 L10,13 L18,13 Z"/>
+                </Button>
+
+                <!-- Divider -->
+                <Border Grid.Column="2" Style="{StaticResource Divider}"/>
+
+                <!-- Location marker (pin without base) -->
+                <Button Grid.Column="6" Style="{StaticResource IconButton}">
+                    <Path Style="{StaticResource IconPath}"
+                          Data="M8,1 C5.239,1 3,3.239 3,6 c0,3.75 5,9 5,9 s5-5.25 5-9 c0-2.761-2.239-5-5-5 z M8,9 A3,3 0 1,1 8,3 A3,3 0 1,1 8,9 z"/>
+                </Button>
+                <!-- Polyline draw (vector) -->
+                <Button Grid.Column="7" Style="{StaticResource IconButton}">
+                    <Path Style="{StaticResource IconPath}"
+                          Data="M2,12 L7,7 L11,11 L16,6"/>
+                </Button>
+                <!-- Polygon draw (vector) -->
+                <Button Grid.Column="8" Style="{StaticResource IconButton}">
+                    <Path Style="{StaticResource IconPath}"
+                          Data="M3,6 L9,4 L15,7 L13,14 L6,15 Z"/>
+                </Button>
+
+                <!-- Divider -->
+                <Border Grid.Column="2" Style="{StaticResource Divider}"/>
+
+                <!-- Undo -->
+                <Button Grid.Column="9" Style="{StaticResource IconButton}">
+                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE7A7;"/>
+                </Button>
+                <!-- Redo -->
+                <Button Grid.Column="10" Style="{StaticResource IconButton}">
+                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE7A6;"/>
+                </Button>
+            </Grid>
+
+            <!-- Right group: card buttons -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- Current location (crosshair - alternate design) -->
+                <Button Style="{StaticResource CardIconButton}">
+                    <Grid Width="18" Height="18">
+                        <!-- Outer ring -->
+                        <Ellipse Stroke="#2563EB" StrokeThickness="1.6"/>
+                        <!-- Tick marks (N,E,S,W) -->
+                        <Rectangle Width="1.2" Height="4" Fill="#2563EB" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,1,0,0"/>
+                        <Rectangle Width="1.2" Height="4" Fill="#2563EB" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,1"/>
+                        <Rectangle Width="4" Height="1.2" Fill="#2563EB" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="1,0,0,0"/>
+                        <Rectangle Width="4" Height="1.2" Fill="#2563EB" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,1,0"/>
+                        <!-- Center dot -->
+                        <Ellipse Width="6" Height="6" Fill="#2563EB" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
+                <!-- Bookmark (vector) -->
+                <Button Style="{StaticResource CardIconButton}">
+                    <Grid Width="18" Height="18">
+                        <Path Stroke="#2563EB" StrokeThickness="1.6" Fill="Transparent"
+                          Data="M4,2 L14,2 L14,16 L9,12 L4,16 Z"/>
+                    </Grid>
+                </Button>
+                <!-- List -->
+                <Button Style="{StaticResource CardIconButton}">
+                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE8FD;"/>
+                </Button>
+                <!-- Layers -->
+                <Button Style="{StaticResource CardIconButton}">
+                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE81E;"/>
+                </Button>
+                <!-- View/Eye (full eye vector) -->
+                <Button Style="{StaticResource CardIconButton}">
+                    <Grid Width="18" Height="18">
+                        <Path Stroke="#2563EB" StrokeThickness="1.6" Fill="Transparent"
+                          Data="M1,9 C3,3 13,3 15,9 C13,15 3,15 1,9 Z"/>
+                        <Ellipse Width="5" Height="5" Fill="#2563EB" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
+                <!-- Zoom in -->
+                <Button Style="{StaticResource CardIconButton}">
+                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE8A3;"/>
+                </Button>
+                <!-- Zoom out -->
+                <Button Style="{StaticResource CardIconButton}">
+                    <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE71F;"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>
+
+

@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Windows.Controls;
 
-namespace KGWin.WPF.Views
+namespace KGWin.WPF.Views.Map
 {
     /// <summary>
     /// Interaction logic for MapLayerManager.xaml

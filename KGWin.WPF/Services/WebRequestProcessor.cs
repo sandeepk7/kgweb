@@ -2,6 +2,7 @@
 using KGWin.WPF.Models;
 using KGWin.WPF.ViewModels;
 using KGWin.WPF.Views;
+using KGWin.WPF.Views.Map;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
@@ -45,7 +46,7 @@ namespace KGWin.WPF.Services
             await mapViewModel.InitializeAsync(config);
 
             KGModalPopupWindow popup = new();
-            var popupViewModel = (ModalPopupViewModel)popup.DataContext;
+            var popupViewModel = (ModalPopupWindowViewModel)popup.DataContext;
             popupViewModel.PopupContent = napervilleMap;
             popup.Show();
         }
