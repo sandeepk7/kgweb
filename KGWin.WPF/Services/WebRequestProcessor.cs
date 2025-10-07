@@ -24,11 +24,11 @@ namespace KGWin.WPF.Services
                 using var jsonDoc = JsonDocument.Parse(messageJson);
                 string typeName = jsonDoc.RootElement.GetProperty("type").ToString();
 
-                RequestType type = Enum.Parse<RequestType>(typeName);
+                FromJsRequestType type = Enum.Parse<FromJsRequestType>(typeName);
 
                 switch (type)
                 {
-                    case RequestType.NapervillePopupWindow:
+                    case FromJsRequestType.NapervillePopupWindow:
                         await ProcessNapervillePopupWindowRequestAsync();
                         break;
                     default:
@@ -46,7 +46,7 @@ namespace KGWin.WPF.Services
             await mapViewModel.InitializeAsync(config);
 
             KGModalPopupWindow popup = new();
-            var popupViewModel = (ModalPopupWindowViewModel)popup.DataContext;
+            var popupViewModel = (KGModalPopupWindowViewModel)popup.DataContext;
             popupViewModel.PopupContent = napervilleMap;
             popup.Show();
         }

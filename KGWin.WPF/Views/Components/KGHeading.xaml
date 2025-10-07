@@ -14,7 +14,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Border Grid.Row="0" Grid.Column="0" Background="{x:Static constant:ColorConstants.HeadingBackground}" Padding="16">
+        <Border Grid.Row="0" Grid.Column="0" Background="{x:Static constant:ColorConstants.HeadingBackground}" Padding="8">
             <TextBlock HorizontalAlignment="Center" FontSize="16" FontWeight="DemiBold" Text="{Binding}"></TextBlock>
         </Border>
     </Grid>

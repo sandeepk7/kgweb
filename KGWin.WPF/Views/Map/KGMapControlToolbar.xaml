@@ -143,7 +143,7 @@
                     <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE721;"/>
                 </Button>
                 <!-- Edit -->
-                <Button Grid.Column="4" Style="{StaticResource IconButton}">
+                <Button Grid.Column="4" Style="{StaticResource IconButton}" Command="{Binding LassoClickedCommand }">
                     <TextBlock Style="{StaticResource IconGlyph}" Text="&#xE70F;"/>
                 </Button>
                 <!-- Mouse pointer (vector) -->

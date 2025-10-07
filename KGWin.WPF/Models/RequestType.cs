@@ -1,11 +1,11 @@
 ﻿namespace KGWin.WPF.Models
 {
-    public enum RequestType
+    public enum FromJsRequestType
     {
         NapervillePopupWindow = 1
     }
 
-    public enum JSRequestType
+    public enum ToJsRequestType
     {
         CreateWorkOrder = 1
     }

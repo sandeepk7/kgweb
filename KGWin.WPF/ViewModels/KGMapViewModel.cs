@@ -37,7 +37,7 @@ namespace KGWin.WPF.ViewModels
         private IArcGisService _arcGisService;
         private Map _map = default!;
         private MapConfig _mapConfig;
-        private ObservableCollection<LayerItemViewModel> _layers = [];
+        private ObservableCollection<KGLayerItemViewModel> _layers = [];
         private ObservableCollection<KGLabelValueViewModel> _popupRows = [];
         private KGPopupViewModel _kgPopupViewModel;
 
@@ -53,7 +53,7 @@ namespace KGWin.WPF.ViewModels
             set => SetProperty(ref _mapConfig, value);
         }
 
-        public ObservableCollection<LayerItemViewModel> Layers
+        public ObservableCollection<KGLayerItemViewModel> Layers
         {
             get => _layers;
             set => SetProperty(ref _layers, value);
@@ -163,7 +163,7 @@ namespace KGWin.WPF.ViewModels
 
                             layerItem.PropertyChanged += (s, e) =>
                             {
-                                if (e.PropertyName == nameof(LayerItemViewModel.IsVisible))
+                                if (e.PropertyName == nameof(KGLayerItemViewModel.IsVisible))
                                 {
                                     layer.IsVisible = layerItem.IsVisible;
                                 }

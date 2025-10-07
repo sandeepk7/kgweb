@@ -6,6 +6,14 @@ namespace KGWin.WPF.ViewModels
 {
     public class KGPopupViewModel : ViewModelBase
     {
+        public KGPopupViewModel()
+        {
+            _isVisible = false;
+            _width = 450;
+            _height = 480;
+            InitializeCommands();
+        }
+
         private string _title = string.Empty;
         private bool _isVisible;
         private double _x;
@@ -59,14 +67,6 @@ namespace KGWin.WPF.ViewModels
             set => SetProperty(ref _buttons, value);
         }
         public ICommand ClosePopupCommand { get; private set; } = null!;
-
-        public KGPopupViewModel()
-        {
-            _isVisible = false;
-            _width = 450;
-            _height = 480;
-            InitializeCommands();
-        }
 
         private void InitializeCommands()
         {

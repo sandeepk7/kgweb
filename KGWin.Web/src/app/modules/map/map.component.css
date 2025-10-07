@@ -69,7 +69,6 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-
 .map-container {
   flex: 1;
   position: relative;
@@ -95,15 +94,15 @@
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .map-header {
     padding: 0.75rem 1rem;
   }
-  
+
   .map-header h2 {
     font-size: 1.25rem;
   }
-  
+
   .map-button {
     padding: 0.4rem 0.8rem;
     font-size: 0.85rem;
@@ -114,14 +113,13 @@
   .map-header {
     padding: 0.5rem 0.75rem;
   }
-  
+
   .map-header h2 {
     font-size: 1.1rem;
   }
-  
+
   .map-button {
     padding: 0.3rem 0.6rem;
     font-size: 0.8rem;
   }
 }
-

@@ -8,8 +8,9 @@ import { CommunicationService, CommunicationMessage } from './communication.serv
   templateUrl: './communication.component.html',
   styleUrls: ['./communication.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
 })
+
 export class CommunicationComponent implements OnInit {
   messages: CommunicationMessage[] = [];
   newMessage: string = '';
@@ -18,15 +19,17 @@ export class CommunicationComponent implements OnInit {
   constructor(private communicationService: CommunicationService) {}
 
   ngOnInit(): void {
-    this.communicationService.messages$.subscribe(messages => {
+    this.communicationService.messages$.subscribe((messages) => {
       this.messages = messages;
     });
 
-    this.communicationService.isConnected$.subscribe(isConnected => {
+    this.communicationService.isConnected$.subscribe((isConnected) => {
       this.isConnected = isConnected;
     });
 
-    this.communicationService.addSystemMessage('KGWin.Web communication initialized. Waiting for WPF connection...');
+    this.communicationService.addSystemMessage(
+      'KGWin.Web communication initialized. Waiting for WPF connection...'
+    );
   }
 
   sendMessage(): void {
@@ -49,9 +52,4 @@ export class CommunicationComponent implements OnInit {
   clearCommunication(): void {
     this.communicationService.clearCommunication();
   }
-
-  testConnection(): void {
-    this.communicationService.testConnection();
-  }
-
 }

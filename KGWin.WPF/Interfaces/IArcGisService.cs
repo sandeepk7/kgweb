@@ -8,7 +8,7 @@ namespace KGWin.WPF.Interfaces
     public interface IArcGisService
     {
         void Initialize();
-        LayerItemViewModel ExtractLayerMetadata(Layer layer);
+        KGLayerItemViewModel ExtractLayerMetadata(Layer layer);
         Task<Dictionary<string, string>> ExtractMapObjectDataOnClickPoint(MapView mapView, Point position, KGPopupViewModel kgPopupVM);
     }
 }

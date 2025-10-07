@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   imports: [RouterModule],
-  standalone: true
+  standalone: true,
 })
 export class AppComponent {
   // Main app component now serves as a container with routing

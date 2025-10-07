@@ -13,7 +13,7 @@ namespace KGWin.WPF.ViewModels
         {
             _configuration = configuration;
             _communicationService = communicationService;
-            _url = _configuration["WebView:Url"]!;
+            _url = _configuration["Web:Url"]!;
 
             var cachePath = _configuration["WebView:CachePath"]!;
             _userDataFolder = Path.Combine(_localAppData, cachePath);
@@ -26,7 +26,7 @@ namespace KGWin.WPF.ViewModels
         private ICommunicationService _communicationService;
         private string _url;
         private string _userDataFolder;
-        private WebView2? _kgWebView;
+        private WebView2 _kgWebView;
 
         public string Url
         {

@@ -2,7 +2,7 @@
 {
     public class KGWebMessage<T>
     {
-        public RequestType RequestType { get; set; }
+        public FromJsRequestType Type { get; set; }
         public T Data { get; set; }
     }
 }

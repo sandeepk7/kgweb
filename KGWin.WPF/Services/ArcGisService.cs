@@ -57,9 +57,9 @@ namespace KGWin.WPF.Interfaces
             }
         }
 
-        public LayerItemViewModel ExtractLayerMetadata(Layer layer)
+        public KGLayerItemViewModel ExtractLayerMetadata(Layer layer)
         {
-            var layerItem = new LayerItemViewModel
+            var layerItem = new KGLayerItemViewModel
             {
                 Name = layer.Name ?? "Unnamed Layer",
                 LayerType = layer.GetType().Name,
@@ -116,127 +116,84 @@ namespace KGWin.WPF.Interfaces
             // Identify features at the clicked location
             var identifyResult = await mapView.IdentifyLayersAsync(position, tolerance, returnPopupsOnly, maxResults);
 
-            if (identifyResult != null && identifyResult.Count > 0)
+            var layerResult = identifyResult?.FirstOrDefault();
+
+            // Find the first layer with results
+            if (layerResult?.GeoElements != null && layerResult.GeoElements.Count > 0)
             {
-                // Find the first layer with results
-                foreach (var layerResult in identifyResult)
+                // Get the layer name
+                var layerName = layerResult.LayerContent?.Name ?? "Unknown Layer";
+
+                // Get the first feature
+                var feature = layerResult.GeoElements[0];
+
+                // Extract attributes
+                var attributes = feature.Attributes;
+
+                if (attributes != null && attributes.Count > 0)
                 {
-                    if (layerResult.GeoElements != null && layerResult.GeoElements.Count > 0)
+                    // Get Object ID from attributes
+                    var objectId = "Unknown";
+                    if (attributes.ContainsKey("OBJECTID"))
                     {
-                        // Get the layer name
-                        var layerName = layerResult.LayerContent?.Name ?? "Unknown Layer";
+                        objectId = attributes["OBJECTID"]?.ToString() ?? "Unknown";
+                    }
+                    else if (attributes.ContainsKey("ObjectId"))
+                    {
+                        objectId = attributes["ObjectId"]?.ToString() ?? "Unknown";
+                    }
+                    else if (attributes.ContainsKey("FID"))
+                    {
+                        objectId = attributes["FID"]?.ToString() ?? "Unknown";
+                    }
 
-                        // Get the first feature
-                        var feature = layerResult.GeoElements[0];
-
-                        // Extract attributes
-                        var attributes = feature.Attributes;
-
-                        if (attributes != null && attributes.Count > 0)
+                    if (layerResult.LayerContent is FeatureLayer featureLayer && featureLayer.PopupDefinition != null)
+                    {
+                        var pd = featureLayer.PopupDefinition;
+                        if (pd.Fields != null && pd.Fields.Count > 0)
                         {
-                            // Get Object ID from attributes
-                            var objectId = "Unknown";
-                            if (attributes.ContainsKey("OBJECTID"))
+                            foreach (var pf in pd.Fields)
                             {
-                                objectId = attributes["OBJECTID"]?.ToString() ?? "Unknown";
+                                var fieldName = pf.FieldName;
+                                var label = string.IsNullOrWhiteSpace(pf.Label) ? fieldName : pf.Label;
+                                string val = attributes.ContainsKey(fieldName) ? attributes[fieldName]?.ToString() ?? "-" : "-";
+                                fields[label] = val;
                             }
-                            else if (attributes.ContainsKey("ObjectId"))
-                            {
-                                objectId = attributes["ObjectId"]?.ToString() ?? "Unknown";
-                            }
-                            else if (attributes.ContainsKey("FID"))
-                            {
-                                objectId = attributes["FID"]?.ToString() ?? "Unknown";
-                            }
-
-                            // Build popup content
-                            var popupContent = new System.Text.StringBuilder();
-                            popupContent.AppendLine($"Feature Type: {feature.Geometry?.GeometryType}");
-                            popupContent.AppendLine("");
-                            popupContent.AppendLine("Attributes:");
-
-                            foreach (var attribute in attributes)
-                            {
-                                var value = attribute.Value?.ToString() ?? "null";
-                                popupContent.AppendLine($"  {attribute.Key}: {value}");
-                            }
-
-                            // Helper to fetch first non-empty attribute by possible keys
-                            //string GetAttr(params string[] keys)
-                            //{
-                            //    foreach (var key in keys)
-                            //    {
-                            //        if (attributes.ContainsKey(key))
-                            //        {
-                            //            var v = attributes[key]?.ToString();
-                            //            if (!string.IsNullOrWhiteSpace(v)) return v!;
-                            //        }
-                            //    }
-                            //    return "-";
-                            //}
-
-                            //// Populate strongly-typed fields (best-effort mappings)
-                            //PopupAssetId = GetAttr("AssetId", "ASSETID", "Asset ID", "ASSET_ID", "FACILITYID", "FACILITY_ID", "OBJECTID", "ObjectId", "FID");
-                            //PopupComments = GetAttr("Comments", "COMMENTS", "Comment");
-                            //PopupLocation = GetAttr("Location", "LOCATION", "LocationDescription_OPS", "LOC_DESC", "ADDR", "Address");
-                            //PopupStatus = GetAttr("Status", "STATUS", "STATE");
-                            //PopupType = GetAttr("Type", "TYPE", "AssetType", "ASSETTYPE");
-                            //PopupLastUpdated = GetAttr("LastUpdated", "LASTUPDATED", "Last_Edit_Date", "EditDate", "LastUpdate");
-
-                            // Build display rows from PopupDefinition if available, else from attributes
-
-                                if (layerResult.LayerContent is FeatureLayer featureLayer && featureLayer.PopupDefinition != null)
-                                {
-                                    var pd = featureLayer.PopupDefinition;
-                                    if (pd.Fields != null && pd.Fields.Count > 0)
-                                    {
-                                        foreach (var pf in pd.Fields)
-                                        {
-                                            var fieldName = pf.FieldName;
-                                            var label = string.IsNullOrWhiteSpace(pf.Label) ? fieldName : pf.Label;
-                                            string val = attributes.ContainsKey(fieldName) ? attributes[fieldName]?.ToString() ?? "-" : "-";
-                                            fields[label] = val;
-                                        }
-                                    }
-                                }
-
-                            // Position near click with clamping to visible area of the MapView
-                            double desiredX = position.X + 10; // right of click
-                            double desiredY = position.Y - 10; // above click
-
-                            // Try to get the map view size to clamp within bounds
-                            var mapViewRef = mapView;
-                            double viewWidth = mapViewRef?.ActualWidth ?? 0;
-                            double viewHeight = mapViewRef?.ActualHeight ?? 0;
-
-                            // Estimated popup size bounds (match XAML MaxWidth/MaxHeight)
-                            double popupWidth = kgPopupVM.Width; // MaxWidth
-                            double popupHeight = kgPopupVM.Height; // MaxHeight
-
-                            // Clamp horizontally
-                            if (viewWidth > 0)
-                            {
-                                if (desiredX + popupWidth > viewWidth) desiredX = Math.Max(0, viewWidth - popupWidth - 10);
-                            }
-
-                            // Clamp vertically (ensure fully visible)
-                            if (viewHeight > 0)
-                            {
-                                if (desiredY + popupHeight > viewHeight) desiredY = Math.Max(0, viewHeight - popupHeight - 10);
-                                if (desiredY < 0) desiredY = 10;
-                            }
-
-                            kgPopupVM.X = desiredX;
-                            kgPopupVM.Y = desiredY;
-
-                            // Show popup with Layer Name + Object ID as title
-                            kgPopupVM.Title = $"{layerName} - ID: {objectId}";
-                            kgPopupVM.IsVisible = true;
-
-                            System.Diagnostics.Debug.WriteLine($"Feature clicked in layer '{layerName}' with Object ID '{objectId}':");
-                            System.Diagnostics.Debug.WriteLine(popupContent.ToString());
                         }
                     }
+
+                    // Position near click with clamping to visible area of the MapView
+                    double desiredX = position.X + 10; // right of click
+                    double desiredY = position.Y - 10; // above click
+
+                    // Try to get the map view size to clamp within bounds
+                    var mapViewRef = mapView;
+                    double viewWidth = mapViewRef?.ActualWidth ?? 0;
+                    double viewHeight = mapViewRef?.ActualHeight ?? 0;
+
+                    // Estimated popup size bounds (match XAML MaxWidth/MaxHeight)
+                    double popupWidth = kgPopupVM.Width; // MaxWidth
+                    double popupHeight = kgPopupVM.Height; // MaxHeight
+
+                    // Clamp horizontally
+                    if (viewWidth > 0)
+                    {
+                        if (desiredX + popupWidth > viewWidth) desiredX = Math.Max(0, viewWidth - popupWidth - 10);
+                    }
+
+                    // Clamp vertically (ensure fully visible)
+                    if (viewHeight > 0)
+                    {
+                        if (desiredY + popupHeight > viewHeight) desiredY = Math.Max(0, viewHeight - popupHeight - 10);
+                        if (desiredY < 0) desiredY = 10;
+                    }
+
+                    kgPopupVM.X = desiredX;
+                    kgPopupVM.Y = desiredY;
+
+                    // Show popup with Layer Name + Object ID as title
+                    kgPopupVM.Title = $"{layerName} - ID: {objectId}";
+                    kgPopupVM.IsVisible = true;
                 }
             }
 

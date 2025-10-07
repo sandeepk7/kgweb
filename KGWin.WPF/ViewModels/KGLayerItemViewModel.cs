@@ -3,7 +3,7 @@ using KGWin.WPF.ViewModels.Base;
 
 namespace KGWin.WPF.ViewModels
 {
-    public class LayerItemViewModel : ViewModelBase
+    public class KGLayerItemViewModel : ViewModelBase
     {
         private bool _isVisible = true;
         private string _name = "";

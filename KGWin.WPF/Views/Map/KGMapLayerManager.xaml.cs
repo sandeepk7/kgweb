@@ -7,9 +7,9 @@ namespace KGWin.WPF.Views.Map
     /// <summary>
     /// Interaction logic for MapLayerManager.xaml
     /// </summary>
-    public partial class MapLayerManager : UserControl
+    public partial class KGMapLayerManager : UserControl
     {
-        public MapLayerManager()
+        public KGMapLayerManager()
         {
             InitializeComponent();
 

@@ -14,22 +14,22 @@
       <!-- Basic Information -->
       <div class="info-section">
         <h4 class="section-title">Basic Information</h4>
-        
+
         <div class="info-row">
           <label class="info-label">ID:</label>
           <span class="info-value">{{ popupData.id }}</span>
         </div>
-        
+
         <div class="info-row">
           <label class="info-label">Type:</label>
           <span class="info-value">{{ popupData.type }}</span>
         </div>
-        
+
         <div class="info-row">
           <label class="info-label">Color:</label>
           <span class="info-value">{{ popupData.color }}</span>
         </div>
-        
+
         <div class="info-row">
           <label class="info-label">Location:</label>
           <span class="info-value">
@@ -43,29 +43,18 @@
       <div class="editable-section">
         <div class="form-group">
           <label class="form-label">Description:</label>
-          <textarea 
-            class="form-input" 
-            rows="3"
-            [(ngModel)]="editedData.description"
+          <textarea class="form-input" rows="3" [(ngModel)]="editedData.description"
             placeholder="Enter description..."></textarea>
         </div>
-        
+
         <div class="form-group">
           <label class="form-label">Status:</label>
-          <input 
-            type="text" 
-            class="form-input"
-            [(ngModel)]="editedData.status"
-            placeholder="Enter status...">
+          <input type="text" class="form-input" [(ngModel)]="editedData.status" placeholder="Enter status...">
         </div>
-        
+
         <div class="form-group">
           <label class="form-label">Notes:</label>
-          <textarea 
-            class="form-input" 
-            rows="4"
-            [(ngModel)]="editedData.notes"
-            placeholder="Enter notes..."></textarea>
+          <textarea class="form-input" rows="4" [(ngModel)]="editedData.notes" placeholder="Enter notes..."></textarea>
         </div>
       </div>
     </div>
@@ -78,6 +67,3 @@
     </div>
   </div>
 </div>
-
-
-

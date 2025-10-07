@@ -1,10 +1,7 @@
-﻿using KGWin.WPF.Models;
-using Microsoft.Web.WebView2.Wpf;
-
-namespace KGWin.WPF.Interfaces
+﻿namespace KGWin.WPF.Interfaces
 {
-    public interface ICommunicationService
+    public interface ICommunicationService : ICefSharpCommunicationService, IWebViewCommunicationService
     {
-        void Initialize(WebView2 kgWebView);
+        Task RaiseCreateWorkOrderAsync(string workOrderData);
     }
 }
