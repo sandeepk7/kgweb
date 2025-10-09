@@ -1,14 +1,20 @@
+using Esri.ArcGISRuntime;
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
+using Esri.ArcGISRuntime.Portal;
+using Esri.ArcGISRuntime.Security;
 using Esri.ArcGISRuntime.UI.Controls;
 using KGWin.WPF.Interfaces;
 using KGWin.WPF.Models;
+using KGWin.WPF.Services;
 using KGWin.WPF.ViewModels.Base;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
+using CredentialManagement;
+using Credential = CredentialManagement.Credential;
 
 namespace KGWin.WPF.ViewModels
 {
@@ -20,19 +26,22 @@ namespace KGWin.WPF.ViewModels
         public KGMapViewModel(
                 IConfiguration configuration,
                 IArcGisService arcGisService,
-                KGPopupViewModel popupViewModel
+                KGPopupViewModel popupViewModel,
+                IAuthService authService
             )
         {
             _configuration = configuration;
             _arcGisService = arcGisService;
+            _authService = authService;
 
-            _mapConfig = MapConfig.GetConfig(LocationName.Default, _configuration);
+            //_mapConfig = MapConfig.GetConfig(LocationName.Default, _configuration);
 
-            var _ = InitializeAsync(_mapConfig);
+            //var _ = InitializeAsync(_mapConfig);
             _kgPopupViewModel = popupViewModel;
             //_kgPopupViewModel.BodyData = PopupRows;
         }
 
+        private readonly IAuthService _authService;
         private IConfiguration _configuration;
         private IArcGisService _arcGisService;
         private Map _map = default!;
@@ -40,6 +49,7 @@ namespace KGWin.WPF.ViewModels
         private ObservableCollection<KGLayerItemViewModel> _layers = [];
         private ObservableCollection<KGLabelValueViewModel> _popupRows = [];
         private KGPopupViewModel _kgPopupViewModel;
+        public int call = 0;
 
         public Map Map
         {
@@ -73,6 +83,8 @@ namespace KGWin.WPF.ViewModels
 
         public async Task InitializeAsync(MapConfig config)
         {
+
+
             MapConfig = config;
 
             if (string.IsNullOrWhiteSpace(MapConfig.VtpkPath))
@@ -84,14 +96,17 @@ namespace KGWin.WPF.ViewModels
                 };
             }
             else
-            {
-                if (MapConfig.LoadLayers)
+            {                
+                if (_authService.IsUserAuthenticated)
                 {
-                    await LoadMapAndLayersAsync();
-                }
-                else
-                {
-                    await LoadVtpkAsync();
+                    if (MapConfig.LoadLayers)
+                    {
+                        await LoadMapAndLayersAsync();
+                    }
+                    else
+                    {
+                        await LoadVtpkAsync();
+                    }
                 }
             }
         }
@@ -111,7 +126,7 @@ namespace KGWin.WPF.ViewModels
                 var labelValueVM = App.Services.GetRequiredService<KGLabelValueViewModel>();
                 labelValueVM.Label = key;
                 labelValueVM.Value = fields[key];
-                PopupRows.Add(labelValueVM);                
+                PopupRows.Add(labelValueVM);
             });
 
             KGPopupViewModel.BodyData = PopupRows;
@@ -182,14 +197,8 @@ namespace KGWin.WPF.ViewModels
             {
                 Uri vtpkUri = new(MapConfig.VtpkPath);
                 ArcGISVectorTiledLayer vectorTileLayer = new(vtpkUri);
-                try
-                {
-                    await vectorTileLayer.LoadAsync();
-                }
 
-                catch (Exception ex)
-                
-                { }
+                await vectorTileLayer.LoadAsync();
 
                 if (MapConfig.LoadLayers && map != null)
                 {
@@ -207,6 +216,50 @@ namespace KGWin.WPF.ViewModels
             }
         }
 
+        public async Task<bool> OAuthLogin()
+        {
+            bool result = true;
+
+            string LoginUrl = _configuration["ArcGISLogin:ArcGISUrl"]!;
+            AuthService.SetChallengeHandler(_configuration);
+
+            try
+            {
+                var requestInfo = new CredentialRequestInfo
+                {
+                    ServiceUri = new Uri(LoginUrl),
+                    AuthenticationType = AuthenticationType.Token
+                };
+
+                var credential = await AuthenticationManager.Current.GetCredentialAsync(requestInfo, false);
+
+                var portal = await ArcGISPortal.CreateAsync(new Uri(LoginUrl), loginRequired: true);
+
+                var user = portal.User;
+
+                PortalQueryParameters queryParams = new PortalQueryParameters("owner:" + user.UserName);
+
+                // Execute query
+                PortalQueryResultSet<PortalItem> resultSet = await portal.FindItemsAsync(queryParams);
+
+                var licenseInfo = await portal.GetLicenseInfoAsync();
+
+                //SaveCredentials(user.UserName, licenseInfo.ToJson(), _configuration["ArcGISLogin:KGWinAppKey"]!);
+
+                var licenseResult = ArcGISRuntimeEnvironment.SetLicense(licenseInfo);
+
+                if (credential != null)
+                {
+                    result = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Login failed: " + ex.Message);
+            }
+
+            return result;
+        }
         private void CreateWorkOrder()
         {
             MessageBox.Show("Hello");
@@ -280,5 +333,18 @@ namespace KGWin.WPF.ViewModels
             //}
         }
 
+        public void SaveCredentials(string username, string licenceKey, string key)
+        {
+            var credential = new Credential
+            {
+                Username = username,
+                Password = licenceKey,
+                Target = key,
+                PersistanceType = PersistanceType.LocalComputer,
+                Type = CredentialType.Generic
+            };
+
+            credential.Save();
+        }
     }
 }

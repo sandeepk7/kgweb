@@ -11,10 +11,10 @@ namespace KGWin.WPF.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public MainWindowViewModel(IConfiguration configuration,ILoginService loginService,KGButtonViewModel kGButtonViewModel
+        public MainWindowViewModel(IConfiguration configuration,KGButtonViewModel kGButtonViewModel
           )
         {
-            _loginService = loginService;
+          
             _configuration = configuration;
 
             kGButtonViewModel.ButtonContent = "Login";
@@ -22,7 +22,7 @@ namespace KGWin.WPF.ViewModels
            _kGButtonViewModel = kGButtonViewModel;
         }
 
-        private ILoginService _loginService;
+        
         IConfiguration _configuration;
 
         private KGButtonViewModel _kGButtonViewModel;
@@ -37,7 +37,7 @@ namespace KGWin.WPF.ViewModels
         {
 
             string LoginUrl = _configuration["ArcGISLogin:ArcGISUrl"]!;
-            LoginService.SetChallengeHandler(_configuration);
+            AuthService.SetChallengeHandler(_configuration);
 
             try
             {
@@ -63,11 +63,7 @@ namespace KGWin.WPF.ViewModels
 
                 var licenseInfo = await portal.GetLicenseInfoAsync();
                 
-                var licenseResult = ArcGISRuntimeEnvironment.SetLicense(licenseInfo);
-
-
-              
-
+                var licenseResult = ArcGISRuntimeEnvironment.SetLicense(licenseInfo);             
 
                 if (credential != null)
                 {

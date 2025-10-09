@@ -10,12 +10,14 @@ namespace KGWin.WPF.Services
 {
     public class WebRequestProcessor : IWebRequestProcessor
     {
-        public WebRequestProcessor(IConfiguration configuration)
+        public WebRequestProcessor(IConfiguration configuration, IAuthService authService)
         {
             _configuration = configuration;
+            _authService = authService;
         }
 
-        private IConfiguration _configuration { get; set; }
+        private IConfiguration _configuration;
+        private IAuthService _authService;
 
         public async Task ProcessRequestAsync(string messageJson)
         {
@@ -39,6 +41,9 @@ namespace KGWin.WPF.Services
 
         private async Task ProcessNapervillePopupWindowRequestAsync()
         {
+            var isAuthenticated = await _authService.CheckUserAuthenticated();
+            if (!isAuthenticated) return;
+
             var config = MapConfig.GetConfig(LocationName.Naperville, _configuration);
 
             KGMap napervilleMap = new();

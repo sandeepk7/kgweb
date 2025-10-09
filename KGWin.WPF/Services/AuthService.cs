@@ -1,20 +1,92 @@
-﻿using Esri.ArcGISRuntime.Security;
+﻿using Esri.ArcGISRuntime.Portal;
+using Esri.ArcGISRuntime;
+using Esri.ArcGISRuntime.Security;
 using KGWin.WPF.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using CefSharp.DevTools.DOM;
 
 namespace KGWin.WPF.Services
 {
-    public class LoginService : ILoginService
+    public class AuthService : IAuthService
     {
         private readonly IConfiguration _configuration;
 
-        public LoginService(IConfiguration configuration)
+        private bool _isLoginInProgress;
+        private bool _isUserAuthenticated;
+        public bool IsUserAuthenticated
+        {
+            get => _isUserAuthenticated;           
+            private set => _isUserAuthenticated = value;
+        }
+
+        public string? AuthenticatedUserName { get; private set; }
+
+        public AuthService(IConfiguration configuration)
         {
             _configuration = configuration;
+        }
+
+        public async Task LoginAsync()
+        {
+            _isLoginInProgress = true;
+            string loginUrl = _configuration["ArcGISLogin:ArcGISUrl"]!;
+            SetChallengeHandler(_configuration);
+
+            try
+            {
+                var requestInfo = new CredentialRequestInfo
+                {
+                    ServiceUri = new Uri(loginUrl),
+                    AuthenticationType = AuthenticationType.Token
+                };
+
+                var credential = await AuthenticationManager.Current.GetCredentialAsync(requestInfo, false);
+                var portal = await ArcGISPortal.CreateAsync(new Uri(loginUrl), loginRequired: true);
+
+                var user = portal.User;
+
+                if (user != null)
+                {
+                    AuthenticatedUserName = user.UserName;
+                    IsUserAuthenticated = true;
+
+                    // Optional: Apply license
+                    var licenseInfo = await portal.GetLicenseInfoAsync();
+                    ArcGISRuntimeEnvironment.SetLicense(licenseInfo);
+
+                    MessageBox.Show("Authenticated Successfull");
+                    _isLoginInProgress = false;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                _isLoginInProgress = false;
+                MessageBox.Show($"Login failed: {ex.Message}", "Authentication Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            IsUserAuthenticated = false;
+            _isLoginInProgress = false;
+        }
+
+        public async Task<bool> CheckUserAuthenticated()
+        {
+            if (IsUserAuthenticated) return true;
+
+            if (!_isLoginInProgress)
+            {
+                await LoginAsync();
+            }
+
+            while (_isLoginInProgress)
+            {
+                await Task.Delay(100);
+            }
+            return IsUserAuthenticated;
         }
 
         public static void SetChallengeHandler(IConfiguration configuration)

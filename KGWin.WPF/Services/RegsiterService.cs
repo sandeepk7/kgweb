@@ -43,7 +43,7 @@ namespace KGWin.WPF.Services
             services.AddSingleton<ICommunicationService, CommunicationService>();
             services.AddTransient<IArcGisService, ArcGisService>();
             services.AddTransient<IWebRequestProcessor, WebRequestProcessor>();
-            services.AddTransient<ILoginService, LoginService>();            
+            services.AddSingleton<IAuthService, AuthService>();
         }
 
         private static void RegisterViewModels(IServiceCollection services)
