@@ -44,6 +44,7 @@ namespace KGWin.WPF.Services
             services.AddTransient<IArcGisService, ArcGisService>();
             services.AddTransient<IWebRequestProcessor, WebRequestProcessor>();
             services.AddSingleton<IAuthService, AuthService>();
+            services.AddSingleton<ILicenseService, LicenseService>();
         }
 
         private static void RegisterViewModels(IServiceCollection services)

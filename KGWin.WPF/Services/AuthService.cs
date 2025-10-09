@@ -7,13 +7,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using System.Windows.Threading;
-using CefSharp.DevTools.DOM;
 
 namespace KGWin.WPF.Services
 {
     public class AuthService : IAuthService
     {
         private readonly IConfiguration _configuration;
+        readonly ILicenseService _licenseService;
 
         private bool _isLoginInProgress;
         private bool _isUserAuthenticated;
@@ -25,9 +25,10 @@ namespace KGWin.WPF.Services
 
         public string? AuthenticatedUserName { get; private set; }
 
-        public AuthService(IConfiguration configuration)
+        public AuthService(IConfiguration configuration, ILicenseService licenseService)
         {
             _configuration = configuration;
+            _licenseService = licenseService;
         }
 
         public async Task LoginAsync()
@@ -45,18 +46,11 @@ namespace KGWin.WPF.Services
                 };
 
                 var credential = await AuthenticationManager.Current.GetCredentialAsync(requestInfo, false);
-                var portal = await ArcGISPortal.CreateAsync(new Uri(loginUrl), loginRequired: true);
 
-                var user = portal.User;
-
-                if (user != null)
+                if (credential != null)
                 {
-                    AuthenticatedUserName = user.UserName;
+                    AuthenticatedUserName = await _licenseService.SaveLicense();
                     IsUserAuthenticated = true;
-
-                    // Optional: Apply license
-                    var licenseInfo = await portal.GetLicenseInfoAsync();
-                    ArcGISRuntimeEnvironment.SetLicense(licenseInfo);
 
                     MessageBox.Show("Authenticated Successfull");
                     _isLoginInProgress = false;
