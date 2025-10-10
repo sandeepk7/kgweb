@@ -21,23 +21,23 @@ namespace KGWin.WPF.Models
                 switch (locationName)
                 {
                     case LocationName.Default:
-                        //{
-                        //    double x = double.Parse(configuration["MapPopup:Default:InitialX"] ?? MapConstants.DefaultX.ToString());
-                        //    double y = double.Parse(configuration["MapPopup:Default:InitialY"] ?? MapConstants.DefaultY.ToString());
-                        //    var scale = int.Parse(configuration["MapPopup:Default:InitialScale"] ?? MapConstants.DefaultScale.ToString());
-                        //    MapPoint mapPoint = new(x, y, SpatialReferences.Wgs84);
-                        //    Viewpoint viewpoint = new(mapPoint, scale);
+                        {
+                           double x = double.Parse(configuration["MapPopup:Default:InitialX"] ?? MapConstants.DefaultX.ToString());
+                           double y = double.Parse(configuration["MapPopup:Default:InitialY"] ?? MapConstants.DefaultY.ToString());
+                           var scale = int.Parse(configuration["MapPopup:Default:InitialScale"] ?? MapConstants.DefaultScale.ToString());
+                           MapPoint mapPoint = new(x, y, SpatialReferences.Wgs84);
+                           Viewpoint viewpoint = new(mapPoint, scale);
 
-                        //    MapConfig config = new()
-                        //    {
-                        //        LoadLayers = false,
-                        //        LocationName = LocationName.Default,
-                        //        MmpkPath = string.Empty,
-                        //        VtpkPath = string.Empty,
-                        //        Viewpoint = viewpoint
-                        //    };
-                        //    return config;
-                        //}
+                           MapConfig config = new()
+                           {
+                               LoadLayers = false,
+                               LocationName = LocationName.Default,
+                               MmpkPath = string.Empty,
+                               VtpkPath = string.Empty,
+                               Viewpoint = viewpoint
+                           };
+                           return config;
+                        }
                     case LocationName.Naperville:
                         {
                             double x = double.Parse(configuration["MapPopup:Naperville:InitialX"] ?? MapConstants.DefaultX.ToString());

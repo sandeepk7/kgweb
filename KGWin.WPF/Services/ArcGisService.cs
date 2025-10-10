@@ -1,13 +1,18 @@
 ﻿using Esri.ArcGISRuntime;
+using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Security;
+using Esri.ArcGISRuntime.Symbology;
+using Esri.ArcGISRuntime.UI;
 using Esri.ArcGISRuntime.UI.Controls;
+using KGWin.WPF.Interfaces;
 using KGWin.WPF.ViewModels;
 using Microsoft.Extensions.Configuration;
 using System.Windows;
+using System.Windows.Input;
 
 
-namespace KGWin.WPF.Interfaces
+namespace KGWin.WPF.Services
 {
     public class ArcGisService : IArcGisService
     {

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace KGWin.WPF.Views.Map
 {
@@ -12,8 +10,6 @@ namespace KGWin.WPF.Views.Map
         public KGMapLayerManager()
         {
             InitializeComponent();
-
-            Debug.WriteLine(JsonSerializer.Serialize(DataContext));
         }
     }
 }

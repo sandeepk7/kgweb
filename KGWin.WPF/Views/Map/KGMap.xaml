@@ -28,23 +28,22 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Border Grid.Row="0" Grid.Column="0" Visibility="{Binding MapConfig.LoadLayers, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0 0 8 0">
+        <Border Grid.Row="0" Grid.Column="0" Visibility="{Binding MapConfig.LoadLayers, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0 0 4 0">
             <local:KGMapLayerManager DataContext="{Binding}"/>
         </Border>
         <Grid Grid.Row="0" Grid.Column="1">
             <esri:MapView 
                 x:Name="KGMapView"
-                Map="{Binding Map}" 
-                GeoViewTapped="KGMapView_GeoViewTapped" />
+                Map="{Binding Map}" />
 
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="4 4 4 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <local:KGMapControlToolbar Grid.Column="0"/>
+                <local:KGMapControlToolbar Grid.Column="0" DataContext="{Binding ToolbarViewModel}"/>
             </Grid>
 
-            <component:KGPopup DataContext="{Binding KGPopupViewModel}">
+            <component:KGPopup DataContext="{Binding MapObjectMetaPopupViewModel}">
                 <component:KGPopup.Body>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding BodyData}">

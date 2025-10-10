@@ -1,4 +1,4 @@
-﻿<Window x:Class="KGWin.WPF.Views.KGModalPopupWindow"
+﻿<Window x:Class="KGWin.WPF.Views.Components.KGModalPopupWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,15 +6,21 @@
         xmlns:local="clr-namespace:KGWin.WPF.Views"
         xmlns:vm="clr-namespace:KGWin.WPF.ViewModels"
         mc:Ignorable="d" 
-        Title="{Binding Title}"      >
-    
+        Title="{Binding Title}"     
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip"
+        ShowInTaskbar="False"
+        WindowStyle="SingleBorderWindow"
+        Background="White"
+        AllowsTransparency="False" >
+
     <Window.Resources>
         <vm:ViewModelLocator x:Key="Locator" />
     </Window.Resources>
     <Window.DataContext>
         <Binding Source="{StaticResource Locator}" Path="ModalPopupViewModel" />
     </Window.DataContext>
-    
+
     <Grid>
         <ContentPresenter Margin="4" Content="{Binding PopupContent}" />
     </Grid>

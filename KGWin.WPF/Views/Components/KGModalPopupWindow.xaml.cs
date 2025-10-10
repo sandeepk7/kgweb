@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace KGWin.WPF.Views
+namespace KGWin.WPF.Views.Components
 {
     /// <summary>
     /// Interaction logic for ModalPopUpWindow.xaml

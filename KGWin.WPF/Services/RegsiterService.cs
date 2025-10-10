@@ -1,5 +1,6 @@
 ﻿using KGWin.WPF.Interfaces;
 using KGWin.WPF.ViewModels;
+using KGWin.WPF.ViewModels.Base;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
@@ -22,7 +23,7 @@ namespace KGWin.WPF.Services
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
                            ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
-                           ?? (System.Diagnostics.Debugger.IsAttached ? "Development" : "Production");
+                           ?? (Debugger.IsAttached ? "Development" : "Production");
 
             Debug.WriteLine($"AppSettingService: Loading environment: {environment}");
             Debug.WriteLine($"AppSettingService: Debugger attached: {Debugger.IsAttached}");
@@ -30,7 +31,7 @@ namespace KGWin.WPF.Services
             var builder = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment}.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: environment == "Production", reloadOnChange: true)
                 .AddEnvironmentVariables();
 
             var configuration = builder.Build();
@@ -43,6 +44,11 @@ namespace KGWin.WPF.Services
             services.AddSingleton<ICommunicationService, CommunicationService>();
             services.AddTransient<IArcGisService, ArcGisService>();
             services.AddTransient<IWebRequestProcessor, WebRequestProcessor>();
+            services.AddTransient<EventAggregator>();
+            services.AddTransient<IMapDrawService, MapDrawService>();
+            
+
+
         }
 
         private static void RegisterViewModels(IServiceCollection services)
@@ -54,6 +60,7 @@ namespace KGWin.WPF.Services
             services.AddTransient<KGPopupViewModel>();
             services.AddTransient<KGButtonViewModel>();
             services.AddTransient<KGLabelValueViewModel>();
+            services.AddTransient<KGMapControlToolbarViewModel>();            
         }    
     }
 }

@@ -13,9 +13,10 @@ namespace KGWin.WPF.ViewModels
         {
             _configuration = configuration;
             _communicationService = communicationService;
-            _url = _configuration["Web:Url"]!;
 
+            _url = _configuration["Web:Url"]!;
             var cachePath = _configuration["WebView:CachePath"]!;
+
             _userDataFolder = Path.Combine(_localAppData, cachePath);
             Directory.CreateDirectory(_userDataFolder);
         }
@@ -31,20 +32,21 @@ namespace KGWin.WPF.ViewModels
         public string Url
         {
             get => _url;
-            set => SetProperty(ref _url, value);
+            set
+            {
+                bool isSet = SetProperty(ref _url, value);
+
+                if (isSet && !string.IsNullOrWhiteSpace(value) && _kgWebView != null)
+                {
+                    _kgWebView.CoreWebView2.Navigate(value);
+                }
+            }
         }
 
         public string UserDataFolder
         {
             get => _userDataFolder;
-            set {
-                bool isSet = SetProperty(ref _userDataFolder, value);
-
-                if(isSet && !string.IsNullOrWhiteSpace(value) && _kgWebView != null)
-                {
-                    _kgWebView.CoreWebView2.Navigate(value);
-                }
-            }
+            set => SetProperty(ref _userDataFolder, value);
         }
 
         public async Task InitializeAsync(WebView2 kgWebView)

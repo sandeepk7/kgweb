@@ -4,11 +4,14 @@ using Esri.ArcGISRuntime.UI.Controls;
 using KGWin.WPF.Interfaces;
 using KGWin.WPF.Models;
 using KGWin.WPF.ViewModels.Base;
+using KGWin.WPF.Views.Components;
+using KGWin.WPF.Views.Map;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 
 namespace KGWin.WPF.ViewModels
 {
@@ -20,26 +23,38 @@ namespace KGWin.WPF.ViewModels
         public KGMapViewModel(
                 IConfiguration configuration,
                 IArcGisService arcGisService,
-                KGPopupViewModel popupViewModel
+                IMapDrawService drawService,
+                EventAggregator eventAggregator,
+                KGPopupViewModel mapObjectMetaPopupViewModel,
+                KGMapControlToolbarViewModel toolbarViewModel
             )
         {
             _configuration = configuration;
             _arcGisService = arcGisService;
+            _drawService = drawService;
 
-            _mapConfig = MapConfig.GetConfig(LocationName.Default, _configuration);
+            _mapObjectMetaPopupViewModel = mapObjectMetaPopupViewModel;
 
-            var _ = InitializeAsync(_mapConfig);
-            _kgPopupViewModel = popupViewModel;
-            //_kgPopupViewModel.BodyData = PopupRows;
+            EventAggregator = eventAggregator;
+            _toolbarViewModel = toolbarViewModel;
+            _toolbarViewModel.EventAggregator = EventAggregator;
+
+            EventAggregator.Subscribe<KGEvent>(HandleEvents);
         }
 
         private IConfiguration _configuration;
         private IArcGisService _arcGisService;
+        private IMapDrawService _drawService;
+        public readonly EventAggregator EventAggregator;
+
         private Map _map = default!;
         private MapConfig _mapConfig;
         private ObservableCollection<KGLayerItemViewModel> _layers = [];
         private ObservableCollection<KGLabelValueViewModel> _popupRows = [];
-        private KGPopupViewModel _kgPopupViewModel;
+        private KGMapControlToolbarViewModel _toolbarViewModel;
+        private KGPopupViewModel _mapObjectMetaPopupViewModel;
+
+        public MapView KGMapView { get; set; }
 
         public Map Map
         {
@@ -65,10 +80,24 @@ namespace KGWin.WPF.ViewModels
             set => SetProperty(ref _popupRows, value);
         }
 
-        public KGPopupViewModel KGPopupViewModel
+        public KGMapControlToolbarViewModel ToolbarViewModel
         {
-            get => _kgPopupViewModel;
-            set => SetProperty(ref _kgPopupViewModel, value);
+            get => _toolbarViewModel;
+            set => SetProperty(ref _toolbarViewModel, value);
+        }
+
+        public KGPopupViewModel MapObjectMetaPopupViewModel
+        {
+            get => _mapObjectMetaPopupViewModel;
+            set => SetProperty(ref _mapObjectMetaPopupViewModel, value);
+        }
+
+        public ICommand GeoViewTappedCommand { get; private set; }
+
+        public void AssiginView(MapView mapView)
+        {
+            KGMapView = mapView;
+            _drawService.Initialize(KGMapView);
         }
 
         public async Task InitializeAsync(MapConfig config)
@@ -94,16 +123,49 @@ namespace KGWin.WPF.ViewModels
                     await LoadVtpkAsync();
                 }
             }
+
+        }
+
+        public async Task RefreshViewpoint()
+        {
+            if (KGMapView != null)
+            {
+                var currentViewpoint = KGMapView.GetCurrentViewpoint(ViewpointType.BoundingGeometry);
+
+                if (currentViewpoint != null)
+                {
+                    await KGMapView.SetViewpointAsync(currentViewpoint);
+                }
+            }
+        }
+
+        private void HandleEvents(KGEvent kgEvent)
+        {
+            switch (kgEvent.EventName)
+            {
+                case nameof(MapView.GeoViewTapped):
+                    {
+                        if (_drawService.IsDrawingModeOn) return;
+
+                        var _ = HandleMapClick((MapView)kgEvent.Sender!, (GeoViewInputEventArgs)kgEvent.Args);
+                        break;
+                    }
+                case KGMapControlToolbar.LassoButtonClick:
+                    {
+                        _drawService.OnLassoSelectClick(kgEvent.Sender!, (RoutedEventArgs)kgEvent.Args);
+                        break;
+                    }
+            }
         }
 
         public async Task HandleMapClick(MapView mapView, GeoViewInputEventArgs e)
         {
             // Close any existing popup
-            KGPopupViewModel.ClosePopup();
-            KGPopupViewModel.Buttons.Clear();
+            MapObjectMetaPopupViewModel.ClosePopup();
+            MapObjectMetaPopupViewModel.Buttons.Clear();
             PopupRows.Clear();
 
-            var fields = await _arcGisService.ExtractMapObjectDataOnClickPoint(mapView, e.Position, KGPopupViewModel);
+            var fields = await _arcGisService.ExtractMapObjectDataOnClickPoint(mapView, e.Position, MapObjectMetaPopupViewModel);
             var fieldsKeys = fields.Keys.ToList();
 
             fieldsKeys.ForEach(key =>
@@ -111,10 +173,10 @@ namespace KGWin.WPF.ViewModels
                 var labelValueVM = App.Services.GetRequiredService<KGLabelValueViewModel>();
                 labelValueVM.Label = key;
                 labelValueVM.Value = fields[key];
-                PopupRows.Add(labelValueVM);                
+                PopupRows.Add(labelValueVM);
             });
 
-            KGPopupViewModel.BodyData = PopupRows;
+            MapObjectMetaPopupViewModel.BodyData = PopupRows;
 
             List<string> buttonConents = new()
             {
@@ -135,7 +197,7 @@ namespace KGWin.WPF.ViewModels
                 buttonVM.ButtonContent = content;
                 buttonVM.ButtonCommand = new RelayCommand(command);
 
-                KGPopupViewModel.Buttons.Add(buttonVM);
+                MapObjectMetaPopupViewModel.Buttons.Add(buttonVM);
             });
 
         }
@@ -151,6 +213,16 @@ namespace KGWin.WPF.ViewModels
                     var mobileMap = mmpk.Maps[0];
 
                     await LoadVtpkAsync(mobileMap);
+                  
+                    if (mobileMap.OperationalLayers != null)
+                    {
+                        var tasks = mobileMap
+                            .OperationalLayers
+                            .Select(l => l.LoadAsync());
+
+                        await Task.WhenAll(tasks);
+                    }
+
                     mobileMap.InitialViewpoint = MapConfig.Viewpoint;
 
                     Map = mobileMap;
@@ -165,7 +237,9 @@ namespace KGWin.WPF.ViewModels
                             {
                                 if (e.PropertyName == nameof(KGLayerItemViewModel.IsVisible))
                                 {
-                                    layer.IsVisible = layerItem.IsVisible;
+                                    Application.Current.Dispatcher.Invoke(() => layer.IsVisible = layerItem.IsVisible);
+
+                                    //layer.IsVisible = layerItem.IsVisible;
                                 }
                             };
 
@@ -202,75 +276,16 @@ namespace KGWin.WPF.ViewModels
 
         private void CreateWorkOrder()
         {
-            MessageBox.Show("Hello");
+            var currentWindow = Application.Current.Windows
+                .OfType<KGModalPopupWindow>()
+                .FirstOrDefault(w => ((KGModalPopupWindowViewModel)w.DataContext).PopupContent is KGMap);
 
-            //try
-            //{
-            //    // Minimize the hosting modal popup window (instead of closing)
-            //    try
-            //    {
-            //        var currentWindow = System.Windows.Application.Current.Windows.OfType<Views.ModalPopupWindow>()
-            //            .FirstOrDefault(w => w.PopupContent is Views.NapervilleView);
-            //        if (currentWindow != null)
-            //        {
-            //            currentWindow.WindowState = System.Windows.WindowState.Minimized;
-            //        }
-            //    }
-            //    catch { }
+            if (currentWindow != null)
+            {
+                currentWindow.WindowState = System.Windows.WindowState.Minimized;
+            }
 
-            //    // Navigate main app to Web page
-            //    if (System.Windows.Application.Current.MainWindow?.DataContext is MainViewModel mainVM)
-            //    {
-            //        // Ensure WebView has an address
-            //        if (mainVM.WebViewModel != null && string.IsNullOrWhiteSpace(mainVM.WebViewModel.BrowserAddress))
-            //        {
-            //            mainVM.WebViewModel.BrowserAddress = "http://localhost:4200/";
-            //        }
-
-            //        mainVM.NavigateToWebCommand.Execute(null);
-
-            //        // After navigation, ask Angular to switch to Create Work Order page
-            //        // Send a command payload the web app listens for
-            //        // Build fields collection from current popup rows
-            //        var fields = new System.Collections.Generic.List<object>();
-            //        foreach (var r in PopupRows)
-            //        {
-            //            fields.Add(new { label = r.Label, value = r.Value });
-            //        }
-
-            //        var payload = new { command = "switchToCreateWorkOrder", context = new { title = PopupTitle, data = SelectedFeatureData, fields } };
-            //        var json = System.Text.Json.JsonSerializer.Serialize(payload);
-
-            //        // 1) CefSharp path (existing logic via CommunicationService in CSWebView)
-            //        mainVM.SendMessageToAngularViaWebView(json);
-
-            //        // 2) WebView2 path (if available)
-            //        try
-            //        {
-            //            if (mainVM.WebView2 != null)
-            //            {
-            //                // Wrap into the same shape Angular listens to: window.postMessage({ type, data }, '*')
-            //                var messageJson = System.Text.Json.JsonSerializer.Serialize(new { type = "communication", data = json });
-            //                mainVM.WebView2.SendMessageToAngular(messageJson);
-            //            }
-            //        }
-            //        catch { }
-
-            //        System.Diagnostics.Debug.WriteLine("Sent navigate command to Angular: " + json);
-            //    }
-
-            //    // Also clear/close the in-view popup content if showing
-            //    ClosePopup();
-            //}
-            //catch (Exception ex)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"Error creating work order: {ex.Message}");
-            //    System.Windows.MessageBox.Show(
-            //        $"Error creating work order: {ex.Message}",
-            //        "Error",
-            //        System.Windows.MessageBoxButton.OK,
-            //        System.Windows.MessageBoxImage.Error);
-            //}
+            MessageBox.Show("Switch to create work order in progress");
         }
 
     }

@@ -7,7 +7,7 @@ namespace KGWin.WPF.ViewModels
     {
         public KGModalPopupWindowViewModel()
         {
-            _title = "Modal Popup Window";
+            _title = "Naperville";
         }
 
         private object? _popupContent;
