@@ -11,12 +11,20 @@
             </div>
         </div>
         <div #mapViewDiv class="map-container"></div>
+
+        <ng-container *ngIf="showUserPopUp">
+            <div style="position:absolute; top:calc(50vh - 100px); left:calc(50vw - 200px); padding: 3rem; background: white; border-radius: 8px;">
+                <!-- <input type="text" [(ngModel)]="userName" /> -->
+                <input type="text" class="form-input" style="padding: 4px 2px; margin: 8px;" [(ngModel)]="userName" placeholder="Enter username...">
+                <div>
+                <button (click)="login()" class="map-button" style="margin-right: 8px;">Login</button>
+                <button (click)="showUserPopUp = false" class="map-button">Close</button>
+                </div>
+            </div>
+        </ng-container>
         
         <!-- Map Popup -->
-        <app-map-popup 
-            [isVisible]="isPopupVisible"
-            [popupData]="popupData"
-            (close)="onPopupClose()"
+        <app-map-popup [isVisible]="isPopupVisible" [popupData]="popupData" (close)="onPopupClose()"
             (save)="onPopupSave($event)">
         </app-map-popup>
     </div>
@@ -24,4 +32,3 @@
     <!-- Communication Section -->
     <app-communication></app-communication>
 </div>
-

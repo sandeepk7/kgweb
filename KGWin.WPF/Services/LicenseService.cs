@@ -44,7 +44,7 @@ namespace KGWin.WPF.Services
 
             var licenseResult = ArcGISRuntimeEnvironment.SetLicense(licenseInfo);
 
-            //SaveCredentials(user.UserName, licenseInfo.ToJson(), Key);
+            SaveCredentials(user.UserName, licenseInfo.ToJson(), Key);
 
             bool isValid = IsLicenseValid(user.UserName);
             return user!.UserName;

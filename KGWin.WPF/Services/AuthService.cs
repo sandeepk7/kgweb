@@ -14,6 +14,7 @@ namespace KGWin.WPF.Services
     {
         private readonly IConfiguration _configuration;
         readonly ILicenseService _licenseService;
+        public string? WebUser { get; set; }
 
         private bool _isLoginInProgress;
         private bool _isUserAuthenticated;
@@ -92,6 +93,17 @@ namespace KGWin.WPF.Services
             var userConfig = new OAuthUserConfiguration(new Uri(LoginUrl), ClientId, new Uri(RedirectUrl));
             AuthenticationManager.Current.OAuthUserConfigurations.Add(userConfig);
             AuthenticationManager.Current.OAuthAuthorizeHandler = new OAuthAuthorize();
+        }
+
+        public bool CheckWebUserLicensed()
+        {
+            var result = _licenseService.IsLicenseValid(WebUser!);
+
+            if(result)
+            {
+                IsUserAuthenticated = true;
+            }
+            return result;
         }
 
         #region OAuth handler

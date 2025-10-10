@@ -4,18 +4,23 @@ import { MapService } from './map.service';
 import { MapPopupComponent, MapPopupData } from './map-popup.component';
 import { CommunicationComponent } from '../communication/communication.component';
 import { CommunicationService } from '../communication/communication.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
   standalone: true,
-  imports: [CommonModule, MapPopupComponent, CommunicationComponent]
+  imports: [CommonModule, MapPopupComponent, CommunicationComponent, FormsModule]
 })
 export class MapComponent implements OnInit, AfterViewInit {
   @ViewChild('mapViewDiv', { static: true }) private mapViewEl!: ElementRef;
 
   // Popup properties
+
+  showUserPopUp =  false;
+  userName = "";
+
   isPopupVisible = false;
   popupData: MapPopupData = {
     id: '',
@@ -33,11 +38,22 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     // Component initialization
+
+    setTimeout(()=>{
+      this.showUserPopUp = true;
+    },10000);
   }
 
   ngAfterViewInit(): void {
     this.initializeMap();
     this.setupPopupSubscription();
+  }
+
+  public async login()
+  {
+    if(!this.userName && this.userName.length < 3) return;
+    this.showUserPopUp = false;
+    this.communicationService.login(this.userName);
   }
 
   private async initializeMap(): Promise<void> {

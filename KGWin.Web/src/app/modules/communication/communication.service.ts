@@ -58,6 +58,22 @@ export class CommunicationService {
     }
   }
 
+  login(username:string): void {
+    const userLoginData = {
+      type: 'UserInfo',
+      data: username,
+    };
+
+    const webview = (window as any).chrome?.webview;
+    if (webview?.postMessage) {
+      webview.postMessage(userLoginData);
+      console.log('Requested WPF Naperville popup via WebView2');
+    } else if ((window as any).communicationService && (window as any).communicationService.openWpfMapPopup) {
+      (window as any).communicationService.openWpfMapPopup(JSON.stringify(userLoginData));
+      console.log('Opening WPF Naperville popup...');
+    }
+  }
+
   private setupCommunication(): void {
     // Check if we're running in CefSharp environment
     this.checkCefSharpConnection();

@@ -2,8 +2,10 @@
 {
     public enum FromJsRequestType
     {
-        NapervillePopupWindow = 1
+        NapervillePopupWindow = 1,
+        UserInfo = 2
     }
+
 
     public enum ToJsRequestType
     {

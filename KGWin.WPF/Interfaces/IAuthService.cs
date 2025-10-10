@@ -6,5 +6,7 @@
         string? AuthenticatedUserName { get; }
         Task LoginAsync();
         Task<bool> CheckUserAuthenticated();
+        string? WebUser { get; set; }
+        bool CheckWebUserLicensed();
     }
 }

@@ -4,7 +4,10 @@ using KGWin.WPF.ViewModels;
 using KGWin.WPF.Views;
 using KGWin.WPF.Views.Map;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Windows;
 
 namespace KGWin.WPF.Services
 {
@@ -33,6 +36,9 @@ namespace KGWin.WPF.Services
                     case FromJsRequestType.NapervillePopupWindow:
                         await ProcessNapervillePopupWindowRequestAsync();
                         break;
+                    case FromJsRequestType.UserInfo:
+                        ProcessUserInfo(messageJson);
+                        break;
                     default:
                         break;
                 }
@@ -54,6 +60,23 @@ namespace KGWin.WPF.Services
             var popupViewModel = (KGModalPopupWindowViewModel)popup.DataContext;
             popupViewModel.PopupContent = napervilleMap;
             popup.Show();
+        }
+
+        private void ProcessUserInfo( string messageJson)
+        {
+            var webUserName = UtilityService.DeserializeJson<KGWebMessage<string>>(messageJson);
+
+            _authService.WebUser = webUserName!.Data;
+            var result = _authService.CheckWebUserLicensed();
+
+            if (result == true)
+            {
+                MessageBox.Show($"Welcome, {_authService.WebUser}!", "Login Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            if (result == false)
+            {
+                MessageBox.Show($"{_authService.WebUser}!", "Login Again", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
     }
 }
