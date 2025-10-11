@@ -1,5 +1,5 @@
-using Microsoft.Data.Sqlite;
-using Quartz;
+﻿using Quartz;
+using System.Text.Json;
 
 namespace KGWin.Schdeuler
 {
@@ -7,96 +7,126 @@ namespace KGWin.Schdeuler
     {
         private readonly ISchedulerFactory _schedulerFactory;
         private readonly ILogger<Worker> _logger;
-        //private readonly string _connectionString = @"Data Source=C:\Users\user\Downloads\QuartzDemo\Database\Worker.db";
-
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
+        private const string LastRunFileName = "job_schedule_history.json";
+        private readonly string _filePath;
 
         public Worker(ISchedulerFactory schedulerFactory, ILogger<Worker> logger, IConfiguration configuration)
         {
             _schedulerFactory = schedulerFactory;
             _logger = logger;
-            _connectionString = configuration.GetConnectionString("Default")!;
-
+            _configuration = configuration;            
+            string rootPath = Directory.GetCurrentDirectory();
+            _filePath = Path.Combine(rootPath, LastRunFileName);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("Starting Quartz Worker...");
+
+            var lastRunEntries = await LoadLastRunEntriesAsync();
+
+            var cronJobs = _configuration.GetSection("JobConfig:CronJobs")
+                                         .Get<List<CronJobConfig>>() ?? new();
+
             var scheduler = await _schedulerFactory.GetScheduler(stoppingToken);
             await scheduler.Start(stoppingToken);
 
+            foreach (var cronJob in cronJobs)
+            {
+                var jobKey = new JobKey(cronJob.JobName, "CronGroup");
+
+                var job = JobBuilder.Create<JobScheduler>()
+                    .WithIdentity(jobKey)
+                    .UsingJobData("JobName", cronJob.JobName)
+                    .UsingJobData("LastRunFilePath", _filePath)
+                    .Build();
+
+                var trigger = TriggerBuilder.Create()
+                    .WithIdentity($"{cronJob.JobName}_Trigger", "CronGroup")
+                    .WithCronSchedule(cronJob.CronSchedule)
+                    .ForJob(job)
+                    .Build();
+
+                await scheduler.ScheduleJob(job, trigger, stoppingToken);
+
+                _logger.LogInformation($"Scheduled '{cronJob.JobName}' with cron '{cronJob.CronSchedule}'");
+
+                // Check for missed execution
+                if (WasJobMissed(cronJob, lastRunEntries))
+                {
+                    _logger.LogWarning($" Missed job detected: {cronJob.JobName}. Running it now...");
+                    await RunMissedJobManually(cronJob.JobName);
+                }
+            }
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                var nextSchedule = await GetNextScheduleTimeAsync();
-
-                if (nextSchedule != null && nextSchedule > DateTime.Now)
-                {
-                    var jobKey = new JobKey(typeof(JobScheduler).Name, "default");
-                    var triggerKey = new TriggerKey("helloTrigger", "default");
-
-                    // Create job if it doesn't exist (durable)
-                    if (!await scheduler.CheckExists(jobKey, stoppingToken))
-                    {
-                        var job = JobBuilder.Create<JobScheduler>()
-                                            .WithIdentity(jobKey)
-                                            .StoreDurably() // Job must be durable
-                                            .UsingJobData("ConnectionString", _connectionString)
-                                            .Build();
-
-                        await scheduler.AddJob(job, true, stoppingToken);
-                        _logger.LogInformation("Job created as durable.");
-                    }
-
-                    // Always create a trigger for the next schedule
-                    var trigger = TriggerBuilder.Create()
-                                                .WithIdentity(triggerKey)
-                                                .ForJob(jobKey)
-                                                .StartAt(nextSchedule.Value)
-                                                .Build();
-
-                    // Schedule or reschedule the trigger
-                    if (await scheduler.CheckExists(triggerKey, stoppingToken))
-                    {
-                        await scheduler.RescheduleJob(triggerKey, trigger, stoppingToken);
-                        _logger.LogInformation($"Rescheduled job to {nextSchedule}");
-                    }
-                    else
-                    {
-                        await scheduler.ScheduleJob(trigger, stoppingToken);
-                        _logger.LogInformation($"Scheduled job at {nextSchedule}");
-                    }
-                }
-
-                // Check DB every 30 seconds for new schedule
-                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
+
+            _logger.LogInformation("Quartz Worker stopping...");
         }
 
-        private async Task<DateTime?> GetNextScheduleTimeAsync()
+        private async Task RunMissedJobManually(string jobName)
         {
-            try
+            var job = new JobScheduler();
+            await job.RunManually(jobName, _filePath);
+        }
+
+        private async Task<List<LastRunEntry>> LoadLastRunEntriesAsync()
+        {
+            if (!File.Exists(_filePath))
+                return new();
+
+            var json = await File.ReadAllTextAsync(_filePath);
+
+            if (string.IsNullOrWhiteSpace(json))
+                return new();
+
+            return JsonSerializer.Deserialize<List<LastRunEntry>>(json) ?? new();
+        }
+
+        private bool WasJobMissed(CronJobConfig jobConfig, List<LastRunEntry> history)
+        {
+            var entry = history.FirstOrDefault(x => x.JobName == jobConfig.JobName);
+            if (entry == null)
+                return true; // Never run before — must be run once
+
+            var cronExpr = new CronExpression(jobConfig.CronSchedule);
+            var lastRun = entry.LastRun;
+
+            // Check for any fire times between the last run and now
+            var fireTimes = GetFireTimesBetween(cronExpr, lastRun, DateTimeOffset.UtcNow);
+
+            return fireTimes.Count > 0 ? true : false; 
+        }
+
+
+        private List<DateTimeOffset> GetFireTimesBetween(CronExpression cron, DateTimeOffset from, DateTimeOffset to)
+        {
+            var times = new List<DateTimeOffset>();
+            var next = cron.GetNextValidTimeAfter(from);
+
+            if(next.HasValue && next.Value > to)
             {
-                await using var connection = new SqliteConnection(_connectionString);
-                await connection.OpenAsync();
-
-                var command = connection.CreateCommand();
-                command.CommandText = @"
-                    SELECT ScheduleDateTime
-                    FROM SchedulerWorker
-                    ORDER BY datetime(ScheduleDateTime) ASC
-                    LIMIT 1;
-                ";
-
-                var result = await command.ExecuteScalarAsync();
-                if (result != null && DateTime.TryParse(result.ToString(), out var dt))
-                    return dt;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"? Error querying Scheduler table: {ex.Message}");
+                times.Add(next.Value);
+                next = cron.GetNextValidTimeAfter(next.Value);
             }
 
-            return null;
+            return times;
+        }
+
+        public class CronJobConfig
+        {
+            public string JobName { get; set; } = default!;
+            public string CronSchedule { get; set; } = default!;
+        }
+
+        public class LastRunEntry
+        {
+            public string JobName { get; set; } = default!;
+            public DateTimeOffset LastRun { get; set; }
         }
     }
 }
-

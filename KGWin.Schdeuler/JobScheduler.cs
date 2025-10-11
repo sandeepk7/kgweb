@@ -1,5 +1,6 @@
 ﻿using Quartz;
-using Microsoft.Data.Sqlite;
+using System.Text.Json;
+using static KGWin.Schdeuler.Worker;
 
 namespace KGWin.Schdeuler
 {
@@ -7,51 +8,51 @@ namespace KGWin.Schdeuler
     {
         public async Task Execute(IJobExecutionContext context)
         {
-            // Read connection string from JobDataMap
-            string connectionString = context.MergedJobDataMap.GetString("ConnectionString")!;
+            string jobName = context.JobDetail.JobDataMap.GetString("JobName") ?? "Unknown";
+            string lastRunFile = context.JobDetail.JobDataMap.GetString("LastRunFilePath") ?? "job_schedule_history.json";
 
-            try
+            Console.WriteLine($"[{DateTimeOffset.UtcNow:O}] Executing job: {jobName}");
+            await UpdateLastRunAsync(jobName, lastRunFile);
+        }
+
+        public async Task RunManually(string jobName, string filePath)
+        {
+            Console.WriteLine($"[MANUAL] Running missed job: {jobName} at {DateTimeOffset.UtcNow:O}");
+            await UpdateLastRunAsync(jobName, filePath);
+        }
+
+        private async Task UpdateLastRunAsync(string jobName, string filePath)
+        {
+            List<LastRunEntry> entries = new();
+
+            if (File.Exists(filePath))
             {
-                await using var connection = new SqliteConnection(connectionString);
-                await connection.OpenAsync();
+                var json = await File.ReadAllTextAsync(filePath);
 
-                // Read current schedule
-                var selectCommand = connection.CreateCommand();
-                selectCommand.CommandText = @"
-                    SELECT Id, ScheduleDateTime
-                    FROM SchedulerWorker
-                    ORDER BY datetime(ScheduleDateTime) ASC
-                    LIMIT 1;
-                ";
-
-                await using var reader = await selectCommand.ExecuteReaderAsync();
-                if (await reader.ReadAsync())
+                if (string.IsNullOrWhiteSpace(json))
+                    entries = new();
+                else
                 {
-                    int id = reader.GetInt32(0);
-                    DateTime currentSchedule = reader.GetDateTime(1);
-                    Console.WriteLine($"[{DateTime.Now}] Job executed at {currentSchedule}");
-
-                    // Add 5 minutes to schedule
-                    DateTime newSchedule = currentSchedule.AddMinutes(5);
-
-                    // Update DB
-                    var updateCommand = connection.CreateCommand();
-                    updateCommand.CommandText = @"
-                        UPDATE SchedulerWorker
-                        SET ScheduleDateTime = @newTime
-                        WHERE Id = @id;
-                    ";
-                    updateCommand.Parameters.AddWithValue("@newTime", newSchedule);
-                    updateCommand.Parameters.AddWithValue("@id", id);
-
-                    await updateCommand.ExecuteNonQueryAsync();
-                    Console.WriteLine($"Schedule updated to {newSchedule}");
+                    entries = JsonSerializer.Deserialize<List<LastRunEntry>>(json) ?? new();
                 }
             }
-            catch (Exception ex)
+
+            var existing = entries.FirstOrDefault(e => e.JobName == jobName);
+            if (existing != null)
             {
-                Console.WriteLine($"Error in HelloJob: {ex.Message}");
+                existing.LastRun = DateTimeOffset.UtcNow;
             }
+            else
+            {
+                entries.Add(new LastRunEntry
+                {
+                    JobName = jobName,
+                    LastRun = DateTimeOffset.UtcNow
+                });
+            }
+
+            var updatedJson = JsonSerializer.Serialize(entries, new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(filePath, updatedJson);
         }
     }
 }

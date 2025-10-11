@@ -12,7 +12,6 @@ Host.CreateDefaultBuilder(args)
         services.AddQuartz();
         services.AddSingleton<IJobFactory, SimpleJobFactory>();
         services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
-
         services.AddHostedService<Worker>();
     })
     .Build()
